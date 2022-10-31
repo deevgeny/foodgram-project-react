@@ -130,3 +130,13 @@ dmypy.json
 
 # .idea
 .idea
+
+# pre-commit hooks
+.flake8
+.pre-commit-config.yaml
+isort.cfg
+pyproject.toml
+
+
+# images dir
+images
