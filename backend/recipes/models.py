@@ -147,9 +147,7 @@ class Recipe(models.Model):
     )
     tag = models.ManyToManyField(
         Tag,
-        verbose_name=_('tag'),
-        blank=True,
-        null=True
+        verbose_name=_('tag')
     )
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name=_('cooking time')
@@ -200,7 +198,7 @@ class Favorite(models.Model):
         Recipe,
         verbose_name=_('recipe'),
         on_delete=models.CASCADE,
-        related_name='is_favorited_by'
+        related_name='is_favorited'
     )
 
     class Meta:
