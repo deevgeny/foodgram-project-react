@@ -1,6 +1,6 @@
-from django.db import models
-from django.core.validators import RegexValidator
 from django.contrib.auth import get_user_model
+from django.core.validators import RegexValidator
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 User = get_user_model()
@@ -67,7 +67,8 @@ class Unit(models.Model):
 
     name = models.CharField(
         max_length=200,
-        verbose_name=_('unit of measure')
+        verbose_name=_('unit of measure'),
+        unique=True
     )
 
     class Meta:
@@ -83,7 +84,8 @@ class Ingredient(models.Model):
 
     name = models.CharField(
         max_length=200,
-        db_index=True
+        db_index=True,
+        unique=True
     )
     measurement_unit = models.ForeignKey(
         Unit,
@@ -106,7 +108,8 @@ class IngredientsList(models.Model):
     item = models.ForeignKey(
         Ingredient,
         verbose_name=_('item'),
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name='ingredients_list'
     )
     amount = models.PositiveSmallIntegerField(
         verbose_name=_('amount')
@@ -182,7 +185,7 @@ class ShoppingCart(models.Model):
         verbose_name_plural = _('shopping carts')
 
     def __str__(self):
-        return f'{self.ingredient.id} {self.amount}'
+        return f'{self.user} {self.recipe}'
 
 
 class Favorite(models.Model):
