@@ -32,3 +32,16 @@ def api_user_client(db, api_client, api_user):
     token = response.json()['auth_token']
     api_client.credentials(HTTP_AUTHORIZATION=f'Token {token}')
     return api_client
+
+
+@pytest.fixture
+def create_five_users(db):
+    base = ['one', 'two', 'three', 'four', 'five']
+    for idx, val in enumerate(base):
+        User.objects.create_user(
+            email=f'{val}@fake.com',
+            username=val,
+            first_name=val,
+            last_name=val,
+            password=f'superpass{val}'
+        )
