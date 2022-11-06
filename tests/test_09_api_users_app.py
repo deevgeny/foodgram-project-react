@@ -13,19 +13,19 @@ CHANGE_PASSWORD_URL = '/api/users/set_password/'
 def test_url_availability(api_client, api_user, create_five_users):
     response = api_client.get(USERS_URL)
     assert response.status_code != HTTPStatus.NOT_FOUND, (
-        f'url {USERS_URL} not found'
+        f'URL {USERS_URL} not found'
     )
     response = api_client.post(LOGIN_URL)
     assert response.status_code != HTTPStatus.NOT_FOUND, (
-        f'url {LOGIN_URL} not found'
+        f'URL {LOGIN_URL} not found'
     )
     response = api_client.post(LOGOUT_URL)
     assert response.status_code != HTTPStatus.NOT_FOUND, (
-        f'url {LOGOUT_URL} not found'
+        f'URL {LOGOUT_URL} not found'
     )
     response = api_client.post(CHANGE_PASSWORD_URL)
     assert response.status_code != HTTPStatus.NOT_FOUND, (
-        f'url {CHANGE_PASSWORD_URL} not found'
+        f'URL {CHANGE_PASSWORD_URL} not found'
     )
     response = api_client.get(USERS_URL + '1/')
     assert response.status_code != HTTPStatus.NOT_FOUND, (

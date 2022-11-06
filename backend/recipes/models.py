@@ -43,6 +43,7 @@ class Tag(models.Model):
         verbose_name=_('HEX color code'),
         unique=True,
         blank=True,
+        null=True,
         validators=[RegexValidator(regex='^#[0-9A-Fa-f]{6}$')]
     )
     slug = models.SlugField(

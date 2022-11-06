@@ -27,7 +27,7 @@ def test_fields_blank_attribute(tag, field_name, value):
 
 
 @pytest.mark.parametrize('field_name, value',
-                         [('name', False), ('hex_code', False),
+                         [('name', False), ('hex_code', True),
                           ('slug', True)])
 def test_fields_null_attribute(tag, field_name, value):
     assert tag._meta.get_field(field_name).null == value, (
