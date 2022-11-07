@@ -29,18 +29,23 @@ def tag(db):
 
 
 @pytest.fixture
-def unit(db):
-    return Unit.objects.create(
-        name='kg',
-    )
+def create_five_units(db):
+    names = ['kg', 'gr', 'pcs', 'ltr', 'cup']
+    units = []
+    for name in names:
+        units.append(Unit.objects.create(name=name))
+    return units
 
 
 @pytest.fixture
-def ingredient(db, unit):
-    return Ingredient.objects.create(
-        name='test',
-        measurement_unit=unit,
-    )
+def create_five_ingredients(db, create_five_units):
+    units = create_five_units
+    names = ['potato', 'sheese', 'apple', 'milk', 'sugar']
+    ingredients = []
+    for i in zip(names, units):
+        ingredients.append(
+            Ingredient.objects.create(name=i[0], measurement_unit=i[1]))
+    return ingredients
 
 
 @pytest.fixture
