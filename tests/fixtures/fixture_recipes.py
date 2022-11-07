@@ -6,7 +6,6 @@ from recipes.models import (
     Recipe,
     ShoppingCart,
     Subscription,
-    Tag,
     Unit,
 )
 
@@ -20,12 +19,8 @@ def subscription(db, user, admin):
 
 
 @pytest.fixture
-def tag(db):
-    return Tag.objects.create(
-        name='tasty snack',
-        hex_code='#000000',
-        slug='tasty_snack'
-    )
+def unit(db):
+    return Unit.objects.create(name='kg')
 
 
 @pytest.fixture
@@ -35,6 +30,11 @@ def create_five_units(db):
     for name in names:
         units.append(Unit.objects.create(name=name))
     return units
+
+
+@pytest.fixture
+def ingredient(db, unit):
+    return Ingredient.objects.create(name='potato', measurement_unit=unit)
 
 
 @pytest.fixture
@@ -50,10 +50,20 @@ def create_five_ingredients(db, create_five_units):
 
 @pytest.fixture
 def ingredients_list(db, ingredient):
-    return IngredientsList.objects.create(
-        item=ingredient,
-        amount=100,
-    )
+    return IngredientsList.objects.create(item=ingredient, amount=100)
+
+
+@pytest.fixture
+def create_five_ingredients_list(db, create_five_ingredients):
+    ingredients = create_five_ingredients
+    ingredients_list = []
+    for amount, ingredient in enumerate(ingredients, start=1):
+        ingredients_list.append(IngredientsList.objects.create(
+            item=ingredient,
+            amount=100,
+        )
+        )
+    return ingredients_list
 
 
 @pytest.fixture
@@ -65,7 +75,20 @@ def recipe(db, user, tag, ingredients_list):
         cooking_time=10
     )
     r.ingredients.add(ingredients_list)
-    r.tag.add(tag)
+    r.tags.add(tag)
+    return r
+
+
+@pytest.fixture
+def create_recipe(db, user, tag, create_five_ingredients_list):
+    r = Recipe.objects.create(
+        author=user,
+        name='recipe',
+        text='Text',
+        cooking_time=10
+    )
+    r.ingredients.add(*create_five_ingredients_list)
+    r.tags.add(tag)
     return r
 
 

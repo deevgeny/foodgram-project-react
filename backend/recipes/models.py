@@ -38,7 +38,7 @@ class Tag(models.Model):
         verbose_name=_('tag name'),
         unique=True
     )
-    hex_code = models.CharField(
+    color = models.CharField(
         max_length=7,
         verbose_name=_('HEX color code'),
         unique=True,
@@ -149,9 +149,9 @@ class Recipe(models.Model):
         IngredientsList,
         verbose_name=_('ingredients')
     )
-    tag = models.ManyToManyField(
+    tags = models.ManyToManyField(
         Tag,
-        verbose_name=_('tag')
+        verbose_name=_('tags')
     )
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name=_('cooking time')
@@ -160,6 +160,7 @@ class Recipe(models.Model):
     class Meta:
         verbose_name = _('recipe')
         verbose_name_plural = _('recipes')
+        ordering = ('-id', )
 
     def __str__(self):
         return self.name

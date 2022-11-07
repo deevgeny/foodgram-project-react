@@ -38,15 +38,16 @@ def test_tags_have_no_pagination(api_client, create_five_tags):
 
 
 @pytest.mark.django_db
-def test_tag_response_data_fields(api_client, create_five_tags):
-    fields = ['id', 'name', 'hex_code', 'slug']
+def test_api_response_fields(api_client, create_five_tags):
+    fields = ['id', 'name', 'color', 'slug']
     response = api_client.get(TAG_URL + '1/')
     assert len(response.json()) == len(fields), (
         f'Tag model api response should have {len(fields)} fields'
     )
     for field in fields:
         assert field in response.json(), (
-            f'Field name `{field}` is missing or incorrect'
+            f'Field name `{field}` is missing or incorrect in Tag model '
+            'api response'
         )
 
 

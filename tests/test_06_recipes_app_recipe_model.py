@@ -43,7 +43,7 @@ def test_ingredients_field(recipe):
 
 
 def test_tag_field(recipe):
-    field = recipe._meta.get_field('tag')
+    field = recipe._meta.get_field('tags')
     assert type(field) == models.ManyToManyField, (
         'Recipe.tag field should be `ManyToManyField` type'
     )
@@ -59,4 +59,10 @@ def test_cooking_time_field(recipe):
 def test_models_str_method(recipe):
     assert str(recipe) == recipe.name, (
         'Recipe model __str__() method output is incorrect'
+    )
+
+
+def test_models_meta_class_attributes(recipe):
+    assert recipe._meta.ordering == ('-id',), (
+        'Recipe model `class Meta` should have `ordering=("-id",)`'
     )

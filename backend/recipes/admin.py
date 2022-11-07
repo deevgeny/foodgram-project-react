@@ -1,8 +1,14 @@
 from django.contrib import admin
 
 from .models import (
-    Subscription, Tag, Unit, Ingredient, IngredientsList, Recipe, ShoppingCart,
-    Favorite
+    Favorite,
+    Ingredient,
+    IngredientsList,
+    Recipe,
+    ShoppingCart,
+    Subscription,
+    Tag,
+    Unit,
 )
 
 
@@ -36,12 +42,12 @@ class IngredientsListAdmin(admin.ModelAdmin):
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     list_display = ('name', 'author', 'favorited_count')
-    list_filter = ('author', 'name', 'tag')
+    list_filter = ('author', 'name', 'tags')
 
     def favorited_count(self, obj):
         '''Count number of times recipe is favorited.'''
         return obj.is_favorited.count()
-    
+
     def change_view(self, request, object_id, form_url='', extra_context=None):
         '''Override change view function to add extra arguments.'''
         extra_context = extra_context or {}

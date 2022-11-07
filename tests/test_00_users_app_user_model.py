@@ -25,3 +25,9 @@ def test_user_login_field():
     assert User.USERNAME_FIELD == 'username', (
         'Incorrect User.USERNAME_FIELD'
     )
+
+
+def test_model_meta_class_attributes(user):
+    assert user._meta.ordering == ('-id',), (
+        'User model `class Meta` should have `ordering=("-id",)`'
+    )
