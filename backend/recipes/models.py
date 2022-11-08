@@ -147,11 +147,13 @@ class Recipe(models.Model):
     )
     ingredients = models.ManyToManyField(
         IngredientsList,
-        verbose_name=_('ingredients')
+        verbose_name=_('ingredients'),
+        blank=False
     )
     tags = models.ManyToManyField(
         Tag,
-        verbose_name=_('tags')
+        verbose_name=_('tags'),
+        blank=False
     )
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name=_('cooking time')
@@ -164,6 +166,11 @@ class Recipe(models.Model):
 
     def __str__(self):
         return self.name
+
+    def delete(self, *args, **kwargs):
+        for ingredient in self.ingredients:
+            ingredient.objects.delete()
+        super(Recipe, self).delete(*args, **kwargs)
 
 
 class ShoppingCart(models.Model):
@@ -197,13 +204,13 @@ class Favorite(models.Model):
         User,
         verbose_name=_('user'),
         on_delete=models.CASCADE,
-        related_name='is_favorited'
+        related_name='favorited_recipes'
     )
     recipe = models.ForeignKey(
         Recipe,
         verbose_name=_('recipe'),
         on_delete=models.CASCADE,
-        related_name='is_favorited'
+        related_name='favorited_by'
     )
 
     class Meta:

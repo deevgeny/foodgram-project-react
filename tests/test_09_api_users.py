@@ -70,7 +70,7 @@ def test_user_registration(api_client):
         'last_name': 'Pupkin',
     }
     response = api_client.post(USERS_URL, data=data)
-    assert response.json() == response_data, (
+    assert response.data == response_data, (
         'Incorrect response data'
     )
     assert response.status_code == HTTPStatus.CREATED, (
@@ -88,7 +88,7 @@ def test_user_registration_with_bad_data(api_client):
     }
     response_data = {'email': ['This field is required.']}
     response = api_client.post(USERS_URL, data=data)
-    assert response.json() == response_data, (
+    assert response.data == response_data, (
         'Incorrect response data'
     )
     assert response.status_code == HTTPStatus.BAD_REQUEST, (
@@ -102,7 +102,7 @@ def test_user_login(api_client, api_user):
     response = api_client.post(
         LOGIN_URL, data={'password': password, 'email': email}
     )
-    assert 'auth_token' in response.json(), (
+    assert 'auth_token' in response.data, (
         'Authorization token is missing in response'
     )
     assert response.status_code == HTTPStatus.CREATED, (
@@ -185,16 +185,16 @@ def test_users_list_pagination_unauthorized(api_client, create_five_users):
     assert response.status_code == HTTPStatus.OK, (
         f'Incorrect response status code {response.status_code}, '
     )
-    assert 'next' in response.json(), (
+    assert 'next' in response.data, (
         'PageNumberPaginator should be used'
     )
-    if response.json()['next']:
-        assert 'limit=' in response.json()['next'], (
+    if response.data['next']:
+        assert 'limit=' in response.data['next'], (
             'PageNumberPaginator should be overiden with '
             '`page_size_query_param="limit"`'
         )
     else:
-        assert response.json()['next'], (
+        assert response.data['next'], (
             'PageNumberPaginator should be overiden with '
             '`page_size_query_param="limit"`'
         )
@@ -247,6 +247,20 @@ def test_current_user_info_authorized(api_user, api_user_client):
         'current user information should be available for '
         'authorized users only'
     )
-    assert response.json()['email'] == email, (
+    assert response.data['email'] == email, (
         f'Incorrect current user information on {CURRENT_USER_URL}'
     )
+
+
+@pytest.mark.django_db
+def test_api_response_fields(api_user, api_user_client):
+    fields = ['email', 'id', 'username', 'first_name', 'last_name',
+              'is_subscribed']
+    response = api_user_client.get(CURRENT_USER_URL)
+    assert len(response.data) == len(fields), (
+        f'User model api response should have {len(fields)} fields'
+    )
+    for field in fields:
+        assert field in response.data, (
+            f'Field name `{field}` is missing or User model api response'
+        )

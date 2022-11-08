@@ -1,13 +1,19 @@
+from django.shortcuts import get_object_or_404
 from djoser import utils
 from djoser.conf import settings
 from djoser.views import TokenCreateView
-from recipes.models import Ingredient, Recipe, Tag
+from recipes.models import Ingredient, IngredientsList, Recipe, Tag
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
-from .serializers import IngredientSerializer, RecipeSerializer, TagSerializer
+from .serializers import (
+    IngredientSerializer,
+    RecipeCreateSerializer,
+    RecipeReadSerializer,
+    TagSerializer,
+)
 
 
 class CustomTokenCreateView(TokenCreateView):
@@ -26,7 +32,7 @@ class CustomTokenCreateView(TokenCreateView):
 
 
 class ReadOnlyNoPaginationModelViewSet(ReadOnlyModelViewSet):
-    '''Parent ModelViewSet class with predifined permissions and pagination.'''
+    '''Base ModelViewSet class with predifined permissions and pagination.'''
 
     permission_classes = (IsAuthenticatedOrReadOnly,)
     pagination_class = None
@@ -50,5 +56,44 @@ class RecipeViewSet(ModelViewSet):
     '''Recipe model viewset.'''
 
     queryset = Recipe.objects.all()
-    serializer_class = RecipeSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
+
+    def get_serializer_class(self):
+        if self.action in ('list', 'retrieve'):
+            return RecipeReadSerializer
+        return RecipeCreateSerializer
+
+    def perform_create(self, serializer):
+        '''Override perform_create method.
+
+        * Add self.request.user to serializer author field before saving.
+        * Return saved model instance for customized response.
+        '''
+        return serializer.save(author=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        '''Override create method.
+
+        * Create ingredients and add to new recipe record.
+        * Return custom response data with RecipeReadSerializer.
+        '''
+        # Create ingredients and add ids to request data
+        ingredients = []
+        for item in request.data.get('ingredients'):
+            ingredient = get_object_or_404(Ingredient, id=item['id'])
+            obj = IngredientsList.objects.create(
+                item=ingredient, amount=item['amount']
+            )
+            ingredients.append(obj.id)
+        request.data['ingredients'] = ingredients
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        recipe = self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        # Prepare custom response data
+        response_serializer = RecipeReadSerializer(recipe)
+        return Response(
+            response_serializer.data, status=status.HTTP_201_CREATED,
+            headers=headers
+        )

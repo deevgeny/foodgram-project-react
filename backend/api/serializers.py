@@ -1,21 +1,26 @@
 from django.contrib.auth import get_user_model
-from djoser.serializers import UserCreateSerializer, UserSerializer
+from djoser.serializers import UserCreateSerializer
 from recipes.models import Ingredient, IngredientsList, Recipe, Tag
 from rest_framework import serializers
 
 User = get_user_model()
 
 
-class CustomUserSerializer(UserSerializer):
-    '''Custom serializer for user model.'''
+class CustomUserReadSerializer(serializers.ModelSerializer):
+    '''User model serializer to display user info.'''
+
+    is_subscribed = serializers.BooleanField(default=False, read_only=True)
 
     class Meta:
         model = User
-        fields = ('email', 'id', 'username', 'first_name', 'last_name')
+        fields = ('email', 'id', 'username', 'first_name', 'last_name',
+                  'is_subscribed')
+        read_only_fields = ('email', 'id', 'username', 'first_name',
+                            'last_name', 'is_subscribed')
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):
-    '''Custom serializer for registration of new users.'''
+    '''Djoser customized serializer for registration of new users.'''
 
     class Meta:
         model = User
@@ -56,13 +61,29 @@ class IngredientsListSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'measurement_unit', 'amount')
 
 
-class RecipeSerializer(serializers.ModelSerializer):
-    '''Recipe model serializer.'''
-    author = CustomUserCreateSerializer(read_only=True)
+class RecipeReadSerializer(serializers.ModelSerializer):
+    '''Recipe model read serializer.'''
+
+    author = CustomUserReadSerializer(read_only=True)
     tags = TagSerializer(read_only=True, many=True)
     ingredients = IngredientsListSerializer(read_only=True, many=True)
+    is_favorited = serializers.BooleanField(read_only=True, default=False)
+    is_in_shopping_cart = serializers.BooleanField(read_only=True,
+                                                   default=False)
 
     class Meta:
         model = Recipe
-        fields = ('id', 'tags', 'author', 'ingredients', 'name', 'image',
-                  'text', 'cooking_time')
+        fields = ('id', 'tags', 'author', 'ingredients', 'is_favorited',
+                  'is_in_shopping_cart', 'name', 'image', 'text',
+                  'cooking_time')
+        read_only_fields = ('id',)
+
+
+class RecipeCreateSerializer(serializers.ModelSerializer):
+    '''Recipe model create serializer.'''
+
+    class Meta:
+        model = Recipe
+        fields = ('tags', 'author', 'ingredients', 'name', 'image', 'text',
+                  'cooking_time')
+        read_only_fields = ('author',)

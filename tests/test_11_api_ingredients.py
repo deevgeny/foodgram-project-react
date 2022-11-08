@@ -33,7 +33,7 @@ def test_urls_unauthenticated_permissions(api_client, create_five_ingredients):
 @pytest.mark.django_db
 def test_ingredients_have_no_pagination(api_client, create_five_ingredients):
     response = api_client.get(INGREDIENT_URL)
-    assert 'count' not in response.json(), (
+    assert 'count' not in response.data, (
         f'URL {INGREDIENT_URL} should not have pagination'
     )
 
@@ -42,11 +42,11 @@ def test_ingredients_have_no_pagination(api_client, create_five_ingredients):
 def test_api_response_fields(api_client, create_five_ingredients):
     fields = ['id', 'name', 'measurement_unit']
     response = api_client.get(INGREDIENT_URL + '1/')
-    assert len(response.json()) == len(fields), (
+    assert len(response.data) == len(fields), (
         f'Ingredient model api response should have {len(fields)} fields'
     )
     for field in fields:
-        assert field in response.json(), (
+        assert field in response.data, (
             f'Field name `{field}` is missing or incorrect in Ingredient '
             'model api response'
         )

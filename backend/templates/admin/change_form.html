@@ -44,8 +44,8 @@
     </p>
     {{ adminform.form.non_field_errors }}
 {% endif %}
-{% if favorited %}
-    <h3>Favorited count: {{ favorited }}</h3>
+{% if favorited_title %}
+    <h3>{{ favorited_title}}: {{ favorited_count }}</h3>
 {% endif %}
 
 {% block field_sets %}
