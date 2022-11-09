@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.core.validators import RegexValidator
+from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -13,18 +13,25 @@ class Subscription(models.Model):
         User,
         on_delete=models.CASCADE,
         verbose_name=_('author'),
-        related_name='subscribers'
+        related_name='subscribed_by'
     )
     subscriber = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         verbose_name=_('subscriber'),
-        related_name='subscriptions'
+        related_name='subscribed_to'
     )
 
     class Meta:
         verbose_name = _('subscription')
         verbose_name_plural = _('subscriptions')
+        constraints = [
+            models.UniqueConstraint(
+                fields=['author', 'subscriber'],
+                name=('Subscription unique together constraint fields: '
+                      'author, subscriber')
+            )
+        ]
 
     def __str__(self):
         return f'{self.subscriber} subscribed to {self.author}'
@@ -85,8 +92,9 @@ class Ingredient(models.Model):
 
     name = models.CharField(
         max_length=200,
+        verbose_name=_('ingredient name'),
         db_index=True,
-        unique=True
+        unique=True,
     )
     measurement_unit = models.ForeignKey(
         Unit,
@@ -103,25 +111,43 @@ class Ingredient(models.Model):
         return f'{self.name} {self.measurement_unit}'
 
 
-class IngredientsList(models.Model):
-    '''Ingredients list model.'''
+class IngredientAmount(models.Model):
+    '''Ingredient amount model.'''
 
-    item = models.ForeignKey(
-        Ingredient,
-        verbose_name=_('item'),
+    recipe = models.ForeignKey(
+        'Recipe',
+        verbose_name=_('recipe'),
         on_delete=models.CASCADE,
-        related_name='ingredients_list'
+        related_name='ingredient_amounts'
+
+    )
+    ingredient = models.ForeignKey(
+        Ingredient,
+        verbose_name=_('ingredient'),
+        on_delete=models.CASCADE,
+        related_name='ingredient_amounts'
     )
     amount = models.PositiveSmallIntegerField(
-        verbose_name=_('amount')
+        verbose_name=_('amount'),
+        validators=[
+            MinValueValidator(1, message=_('Amount should be more than 0'))
+        ]
     )
 
     class Meta:
-        verbose_name = _('ingredients list')
-        verbose_name_plural = _('ingredients lists')
+        verbose_name = _('ingredient amount')
+        verbose_name_plural = _('ingredient amounts')
+        constraints = [
+            models.UniqueConstraint(
+                fields=['recipe', 'ingredient'],
+                name=('IngredientAmount unique together constratint fields: '
+                      'recipe, ingredient')
+            )
+        ]
 
     def __str__(self):
-        return f'{self.item} {self.amount}'
+        return (f'{self.recipe} {self.item.name} {self.amount} '
+                f'{self.item.measurement_unit}')
 
 
 class Recipe(models.Model):
@@ -139,16 +165,18 @@ class Recipe(models.Model):
     )
     image = models.ImageField(
         verbose_name=_('image'),
-        upload_to='recipes/',
+        upload_to='images/',
         blank=True
     )
     text = models.TextField(
         verbose_name=_('description')
     )
     ingredients = models.ManyToManyField(
-        IngredientsList,
+        Ingredient,
         verbose_name=_('ingredients'),
-        blank=False
+        blank=False,
+        related_name='recipes',
+        through=IngredientAmount,
     )
     tags = models.ManyToManyField(
         Tag,
@@ -156,7 +184,12 @@ class Recipe(models.Model):
         blank=False
     )
     cooking_time = models.PositiveSmallIntegerField(
-        verbose_name=_('cooking time')
+        verbose_name=_('cooking time'),
+        validators=[
+            MinValueValidator(
+                1, message=_('Cooking time should be more than 0')
+            )
+        ]
     )
 
     class Meta:
@@ -167,11 +200,6 @@ class Recipe(models.Model):
     def __str__(self):
         return self.name
 
-    def delete(self, *args, **kwargs):
-        for ingredient in self.ingredients:
-            ingredient.objects.delete()
-        super(Recipe, self).delete(*args, **kwargs)
-
 
 class ShoppingCart(models.Model):
     '''Recipe shopping cart model.'''
@@ -180,13 +208,13 @@ class ShoppingCart(models.Model):
         User,
         verbose_name=_('user'),
         on_delete=models.CASCADE,
-        related_name='my_shopping_cart'
+        related_name='shopping_cart'
     )
     recipe = models.ForeignKey(
         Recipe,
         verbose_name=_('recipe'),
         on_delete=models.CASCADE,
-        related_name='all_shopping_carts'
+        related_name='shopping_cart'
     )
 
     class Meta:
@@ -204,7 +232,7 @@ class Favorite(models.Model):
         User,
         verbose_name=_('user'),
         on_delete=models.CASCADE,
-        related_name='favorited_recipes'
+        related_name='favorites'
     )
     recipe = models.ForeignKey(
         Recipe,
@@ -216,6 +244,13 @@ class Favorite(models.Model):
     class Meta:
         verbose_name = _('favorite')
         verbose_name_plural = _('favorites')
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'recipe'],
+                name=('Favorite unique together constratint fields: '
+                      'user, recipe')
+            )
+        ]
 
     def __str__(self):
         return f'{self.user} {self.recipe}'

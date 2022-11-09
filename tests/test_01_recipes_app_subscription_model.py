@@ -14,8 +14,8 @@ def test_fields_on_delete_attribute(subscription, field_name, value):
 
 
 @pytest.mark.parametrize('field_name, value',
-                         [('author', 'subscribers'),
-                          ('subscriber', 'subscriptions')])
+                         [('author', 'subscribed_by'),
+                          ('subscriber', 'subscribed_to')])
 def test_fields_related_name_attribute(subscription, field_name, value):
     assert subscription._meta.get_field(
         field_name).remote_field.related_name == value, (

@@ -2,7 +2,7 @@ import pytest
 from recipes.models import (
     Favorite,
     Ingredient,
-    IngredientsList,
+    IngredientAmount,
     Recipe,
     ShoppingCart,
     Subscription,
@@ -49,8 +49,8 @@ def create_five_ingredients(db, create_five_units):
 
 
 @pytest.fixture
-def ingredients_list(db, ingredient):
-    return IngredientsList.objects.create(item=ingredient, amount=100)
+def ingredient_amount(db, ingredient):
+    return IngredientAmount.objects.create(ingredient=ingredient, amount=100)
 
 
 @pytest.fixture
@@ -58,7 +58,7 @@ def create_five_ingredients_list(db, create_five_ingredients):
     ingredients = create_five_ingredients
     ingredients_list = []
     for amount, ingredient in enumerate(ingredients, start=1):
-        ingredients_list.append(IngredientsList.objects.create(
+        ingredients_list.append(IngredientAmount.objects.create(
             item=ingredient,
             amount=100,
         )
