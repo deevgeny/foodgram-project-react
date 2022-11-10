@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from itertools import zip_longest
 
 import pytest
 
@@ -7,6 +8,14 @@ CURRENT_USER_URL = '/api/users/me/'
 LOGIN_URL = '/api/auth/token/login/'
 LOGOUT_URL = '/api/auth/token/logout/'
 CHANGE_PASSWORD_URL = '/api/users/set_password/'
+FORBIDDEN_POST_URLS = [
+    '/api/users/reset_password_confirm/',
+    '/api/users/set_username/', '/api/users/reset_username/',
+    '/api/users/reset_username_confirm/', '/api/users/activation/',
+]
+NOT_FOUND_URLS = [
+    '/api/jwt/create/', '/api/jwt/refresh/', '/api/jwt/verify/'
+]
 
 
 @pytest.mark.django_db
@@ -50,6 +59,32 @@ def test_url_availability(api_client, api_user, create_five_users):
         f'Improper configuration of URL {LOGOUT_URL} in urls.py '
         'use re_path() with regex expression to prevent redirection for '
         f'address without trailing slash {LOGOUT_URL[:-1]}'
+    )
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'url, response_code',
+    list(zip_longest(
+        FORBIDDEN_POST_URLS, (), fillvalue=HTTPStatus.FORBIDDEN
+    )))
+def test_blocked_post_urls(api_user_client, url, response_code):
+    response = api_user_client.post(url)
+    assert response.status_code == response_code, (
+        f'URL {url} should be forbidden'
+    )
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'url, response_code',
+    list(zip_longest(
+        NOT_FOUND_URLS, (), fillvalue=HTTPStatus.NOT_FOUND
+    )))
+def test_not_found_get_urls(api_user_client, url, response_code):
+    response = api_user_client.get(url)
+    assert response.status_code == response_code, (
+        f'URL {url} should be forbidden'
     )
 
 

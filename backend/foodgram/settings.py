@@ -118,6 +118,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ],
+    'DEFAULT_PAGINATION_CLASS': 'api.paginators.CustomPageNumberPagination',
 }
 
 # Djoser settings
@@ -134,6 +135,11 @@ DJOSER = {
     'PERMISSIONS': {
         'user': ['rest_framework.permissions.IsAuthenticated'],
         'user_list': ['rest_framework.permissions.AllowAny'],
+        'activation': ['api.permissions.Block'],
+        'password_reset_confirm': ['api.permissions.Block'],
+        'username_reset': ['api.permissions.Block'],
+        'username_reset_confirm': ['api.permissions.Block'],
+        'set_username': ['api.permissions.Block'],
     }
 }
 

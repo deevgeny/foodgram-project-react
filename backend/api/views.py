@@ -30,7 +30,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from .filters import IngredientSearchFilter, RecipeFilter
-from .paginator import CustomPageNumberPagination
+from .paginators import CustomPageNumberPagination
 from .permissions import IsAuthorIsAdminOrReadOnly
 from .serializers import (
     FavoriteSerializer,
@@ -63,7 +63,8 @@ class CustomTokenCreateView(TokenCreateView):
 class TagViewSet(ReadOnlyModelViewSet):
     '''Tag model viewset.
 
-    * GET method - list(), retrieve().
+    * GET method - list(), retrieve()
+    * no pagination.
     '''
 
     queryset = Tag.objects.all()

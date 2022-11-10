@@ -19,3 +19,10 @@ class IsAuthorIsAdminOrReadOnly(permissions.BasePermission):
             return (request.user.is_superuser
                     or obj.author == request.user)
         return False
+
+
+class Block(permissions.BasePermission):
+    '''Block access for all users.'''
+
+    def has_permission(self, request, view):
+        return False
