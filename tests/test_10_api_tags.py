@@ -46,7 +46,7 @@ def test_api_response_fields(api_client, create_five_tags):
     )
     for field in fields:
         assert field in response.data, (
-            f'Field name `{field}` is missing or incorrect in Tag model '
+            f'Field name {field} is missing or incorrect in Tag model '
             'api response'
         )
 

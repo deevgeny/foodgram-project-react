@@ -226,12 +226,12 @@ def test_users_list_pagination_unauthorized(api_client, create_five_users):
     if response.data['next']:
         assert 'limit=' in response.data['next'], (
             'PageNumberPaginator should be overiden with '
-            '`page_size_query_param="limit"`'
+            'page_size_query_param="limit"'
         )
     else:
         assert response.data['next'], (
             'PageNumberPaginator should be overiden with '
-            '`page_size_query_param="limit"`'
+            'page_size_query_param="limit"'
         )
 
 
@@ -297,5 +297,5 @@ def test_api_response_fields(api_user, api_user_client):
     )
     for field in fields:
         assert field in response.data, (
-            f'Field name `{field}` is missing or User model api response'
+            f'Field name {field} is missing or User model api response'
         )

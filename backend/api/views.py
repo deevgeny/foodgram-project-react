@@ -80,11 +80,13 @@ class IngredientViewSet(ReadOnlyModelViewSet):
     * Search filter by Ingredient.name field.
     '''
 
+    from rest_framework.filters import SearchFilter
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
+    pagination_class = None
     filter_backends = [IngredientSearchFilter]
-    search_field = ('^name',)
+    search_fields = ('^name',)
 
 
 class RecipeViewSet(ModelViewSet):
