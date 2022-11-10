@@ -61,7 +61,10 @@ class CustomTokenCreateView(TokenCreateView):
 
 
 class TagViewSet(ReadOnlyModelViewSet):
-    '''Tag model viewset.'''
+    '''Tag model viewset.
+
+    * GET method - list(), retrieve().
+    '''
 
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
@@ -69,7 +72,11 @@ class TagViewSet(ReadOnlyModelViewSet):
 
 
 class IngredientViewSet(ReadOnlyModelViewSet):
-    '''Ingredient model viewset.'''
+    '''Ingredient model viewset.
+
+    * GET method - list(), retrieve().
+    * Search filter by Ingredient.name field.
+    '''
 
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
@@ -79,7 +86,13 @@ class IngredientViewSet(ReadOnlyModelViewSet):
 
 
 class RecipeViewSet(ModelViewSet):
-    '''Recipe model viewset.'''
+    '''Recipe model viewset.
+
+    * GET method - list(), retrive().
+    * POST method - create().
+    * PATCH method - partial_update().
+    * DELETE method - destroy().
+    '''
 
     queryset = Recipe.objects.all()
     permission_classes = [IsAuthorIsAdminOrReadOnly]
@@ -93,15 +106,15 @@ class RecipeViewSet(ModelViewSet):
         return RecipeCreateSerializer
 
     @staticmethod
-    def post_method_for_actions(request, pk, serializers):
+    def actions_post_method(request, pk, serializer_class):
         data = {'user': request.user.id, 'recipe': pk}
-        serializer = serializers(data=data, context={'request': request})
+        serializer = serializer_class(data=data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @staticmethod
-    def delete_method_for_actions(request, pk, model):
+    def actions_delete_method(request, pk, model):
         user = request.user
         recipe = get_object_or_404(Recipe, id=pk)
         try:
@@ -116,23 +129,23 @@ class RecipeViewSet(ModelViewSet):
     @action(detail=True, methods=["POST"],
             permission_classes=[IsAuthenticated])
     def favorite(self, request, pk):
-        return self.post_method_for_actions(
-            request=request, pk=pk, serializers=FavoriteSerializer)
+        return self.actions_post_method(
+            request=request, pk=pk, serializer_class=FavoriteSerializer)
 
     @favorite.mapping.delete
     def delete_favorite(self, request, pk):
-        return self.delete_method_for_actions(
+        return self.actions_delete_method(
             request=request, pk=pk, model=Favorite)
 
     @action(detail=True, methods=["POST"],
             permission_classes=[IsAuthenticated])
     def shopping_cart(self, request, pk):
-        return self.post_method_for_actions(
-            request=request, pk=pk, serializers=ShoppingCartSerializer)
+        return self.actions_post_method(
+            request=request, pk=pk, serializer_class=ShoppingCartSerializer)
 
     @shopping_cart.mapping.delete
     def delete_shopping_cart(self, request, pk):
-        return self.delete_method_for_actions(
+        return self.actions_delete_method(
             request=request, pk=pk, model=ShoppingCart)
 
     @action(detail=False, methods=['get'],
@@ -173,7 +186,10 @@ class RecipeViewSet(ModelViewSet):
 
 
 class SubscriptionListView(ListAPIView):
-    """Subscription model view: GET."""
+    """Subscription model view.
+
+    * GET method - list()
+    """
 
     serializer_class = SubscriptionSerializer
     permission_classes = [IsAuthenticated]
@@ -184,7 +200,11 @@ class SubscriptionListView(ListAPIView):
 
 
 class SubscriptionViewSet(APIView):
-    """Subscription model view: POST DELETE."""
+    """Subscription model view.
+
+    * POST method - Subscription.objects.create()
+    * DELETE method - Subscription.objects.delete()
+    """
 
     serializer_class = SubscriptionSerializer
     permission_classes = [IsAuthenticated]

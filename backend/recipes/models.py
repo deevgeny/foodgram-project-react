@@ -49,17 +49,12 @@ class Tag(models.Model):
         max_length=7,
         verbose_name=_('HEX color code'),
         unique=True,
-        blank=True,
-        null=True,
         validators=[RegexValidator(regex='^#[0-9A-Fa-f]{6}$')]
     )
     slug = models.SlugField(
         max_length=200,
         verbose_name=_('slug'),
         unique=True,
-        blank=True,
-        null=True
-
     )
 
     class Meta:
@@ -124,7 +119,7 @@ class IngredientAmount(models.Model):
     ingredient = models.ForeignKey(
         Ingredient,
         verbose_name=_('ingredient'),
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         related_name='ingredient_amounts'
     )
     amount = models.PositiveSmallIntegerField(
@@ -140,14 +135,14 @@ class IngredientAmount(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=['recipe', 'ingredient'],
-                name=('IngredientAmount unique together constratint fields: '
+                name=('IngredientAmount unique together constraint fields: '
                       'recipe, ingredient')
             )
         ]
 
     def __str__(self):
-        return (f'{self.recipe} {self.item.name} {self.amount} '
-                f'{self.item.measurement_unit}')
+        return (f'{self.recipe} {self.ingredient.name} {self.amount} '
+                f'{self.ingredient.measurement_unit}')
 
 
 class Recipe(models.Model):
@@ -166,7 +161,6 @@ class Recipe(models.Model):
     image = models.ImageField(
         verbose_name=_('image'),
         upload_to='images/',
-        blank=True
     )
     text = models.TextField(
         verbose_name=_('description')
@@ -195,7 +189,7 @@ class Recipe(models.Model):
     class Meta:
         verbose_name = _('recipe')
         verbose_name_plural = _('recipes')
-        ordering = ('-id', )
+        ordering = ('id', )
 
     def __str__(self):
         return self.name
@@ -247,7 +241,7 @@ class Favorite(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=['user', 'recipe'],
-                name=('Favorite unique together constratint fields: '
+                name=('Favorite unique together constraint fields: '
                       'user, recipe')
             )
         ]

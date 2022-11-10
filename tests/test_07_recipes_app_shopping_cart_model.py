@@ -1,27 +1,31 @@
 from django.db import models
 
 
-def test_user_field(shopping_cart):
+def test_model_user_field(shopping_cart):
     field = shopping_cart._meta.get_field('user')
-    assert field.remote_field.on_delete == models.CASCADE, (
-        'ShoppingCart.user field should be defined as '
-        '`on_delete=models.CASCADE`'
+    on_delete = models.CASCADE
+    related_name = 'shopping_cart'
+    assert field.remote_field.on_delete == on_delete, (
+        f'ShoppingCart.{field.name} field should be defined as '
+        f'on_delete=models.{on_delete.__name__}'
     )
-    assert field.remote_field.related_name == 'my_shopping_cart', (
-        'ShoppingCart.user field should be defined as '
-        '`related_name="my_shopping_cart`'
+    assert field.remote_field.related_name == related_name, (
+        f'ShoppingCart.{field.name} field should be defined as '
+        f'related_name={related_name}'
     )
 
 
-def test_recipe_field(shopping_cart):
+def test_model_recipe_field(shopping_cart):
     field = shopping_cart._meta.get_field('recipe')
-    assert field.remote_field.on_delete == models.CASCADE, (
-        'ShoppingCart.recipe field should be defined as '
-        '`on_delete=models.CASCADE`'
+    on_delete = models.CASCADE
+    related_name = 'shopping_cart'
+    assert field.remote_field.on_delete == on_delete, (
+        f'ShoppingCart.{field.name} field should be defined as '
+        f'on_delete=models.{on_delete.__name__}'
     )
-    assert field.remote_field.related_name == 'all_shopping_carts', (
-        'ShoppingCart.recipe field should be defined as '
-        '`related_name="all_shopping_carts`'
+    assert field.remote_field.related_name == related_name, (
+        f'ShoppingCart.{field.name} field should be defined as '
+        f'related_name={related_name}'
     )
 
 

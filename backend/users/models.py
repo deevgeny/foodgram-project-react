@@ -11,4 +11,4 @@ class User(AbstractUser):
     last_name = models.CharField(_("last name"), max_length=150)
 
     class Meta:
-        ordering = ('-id',)
+        ordering = ('id',)

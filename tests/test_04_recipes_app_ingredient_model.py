@@ -1,28 +1,30 @@
 from django.db import models
 
 
-def test_name_field(ingredient):
+def test_model_name_field(ingredient):
     field = ingredient._meta.get_field('name')
     assert field.max_length == 200, (
-        'Ingredient.name field should be defiend as `max_length=200`'
+        f'Ingredient.{field.name} field should be defiend as max_length=200'
     )
     assert field.db_index, (
-        'Ingredient.name field should be defiend as `db_index=True`'
+        f'Ingredient.{field.name} field should be defiend as db_index=True'
     )
     assert field.unique, (
-        'Ingredient.name field should be defiend as `unique=True`'
+        f'Ingredient.{field.name} field should be defiend as unique=True'
     )
 
 
-def test_measurement_unit_field(ingredient):
+def test_model_measurement_unit_field(ingredient):
     field = ingredient._meta.get_field('measurement_unit')
-    assert field.remote_field.on_delete == models.PROTECT, (
-        'Ingredient.measurement_unit field should be defiend as '
-        '`on_delete=models.CASCADE`'
+    on_delete = models.PROTECT
+    related_name = 'ingredients'
+    assert field.remote_field.on_delete == on_delete, (
+        f'Ingredient.{field.name} field should be defiend as '
+        f'on_delete=models.{on_delete.__name__}'
     )
-    assert field.remote_field.related_name == 'ingredients', (
-        'Ingredient.measurement_unit field should be defiend as '
-        '`related_name="ingredients"`'
+    assert field.remote_field.related_name == related_name, (
+        f'Ingredient.{field.name} field should be defiend as '
+        f'related_name={related_name}'
     )
 
 

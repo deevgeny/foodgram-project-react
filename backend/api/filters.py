@@ -8,10 +8,14 @@ class IngredientSearchFilter(SearchFilter):
 
 
 class RecipeFilter(FilterSet):
-    """
-    Фильтры для сортировки рецептов по:
-    тегам, нахождению в избранном и корзине.
-    """
+    '''Custom recipe filter.
+
+    * filter by author
+    * filter by tag (slug field)
+    * filter by is_in_shopping_cart
+    * filter by is_favorited
+    '''
+
     tags = filters.AllValuesMultipleFilter(field_name='tags__slug')
     is_favorited = filters.BooleanFilter(method='filter_is_favorited')
     is_in_shopping_cart = filters.BooleanFilter(
