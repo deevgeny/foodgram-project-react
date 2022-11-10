@@ -14,8 +14,11 @@ def tag(db):
 @pytest.fixture
 def create_five_tags(db):
     tags = ['one', 'two', 'tree', 'four', 'five']
-    for tag in tags:
+    colors = ['#111111', '#222222', '#333333', '#444444', '#555555']
+
+    for i in range(len(tags)):
         Tag.objects.create(
-            name=tag,
-            slug=tag
+            name=tags[i],
+            color=colors[i],
+            slug=tags[i]
         )

@@ -8,5 +8,5 @@ pytest_plugins = [
     'tests.fixtures.fixture_recipe_model',
     'tests.fixtures.fixture_shopping_cart_model',
     'tests.fixtures.fixture_favorite_model',
-    'tests.fixtures.fixture_api',
+    'tests.fixtures.fixture_api_clients',
 ]
