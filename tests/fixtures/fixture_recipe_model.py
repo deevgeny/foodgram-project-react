@@ -1,9 +1,14 @@
 import pytest
+from django.contrib.auth import get_user_model
 from recipes.models import Recipe
+
+User = get_user_model()
 
 
 @pytest.fixture
-def recipe(db, user, tag):
+def recipe(db, api_user, tag):
+    _, email = api_user
+    user = User.objects.get(email=email)
     obj = Recipe.objects.create(
         author=user,
         name='Test recipe',
@@ -22,6 +27,5 @@ def create_recipe(db, user, tag, create_five_ingredient_amounts):
         text='Text',
         cooking_time=10
     )
-    obj.ingredients.add(*create_five_ingredient_amounts)
     obj.tags.add(tag)
     return obj

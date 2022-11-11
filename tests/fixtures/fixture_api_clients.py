@@ -12,7 +12,8 @@ def api_client():
 
 
 @pytest.fixture
-def api_user(db, api_client):
+def api_user(db):
+    client = APIClient()
     data = {
         'email': 'user@fake.com',
         'username': 'user',
@@ -20,18 +21,49 @@ def api_user(db, api_client):
         'last_name': 'Pupkin',
         'password': 'VeryStrongPassword'
     }
-    api_client.post('/api/users/', data=data)
+    client.post('/api/users/', data=data)
     return data['password'], data['email']
 
 
 @pytest.fixture
-def api_user_client(db, api_client, api_user):
+def api_another_user(db):
+    data = {
+        'email': 'anotheruser@fake.com',
+        'username': 'anotheruser',
+        'first_name': 'AnotherVasya',
+        'last_name': 'AnotherPupkin',
+        'password': 'VeryStrongPassword'
+    }
+    User.objects.create_user(
+        email=data['email'],
+        username=data['username'],
+        first_name=data['first_name'],
+        last_name=data['last_name'],
+        password=data['password']
+    )
+    return data['password'], data['email']
+
+
+@pytest.fixture
+def api_user_client(db, api_user):
+    client = APIClient()
     password, email = api_user
-    response = api_client.post('/api/auth/token/login/',
-                               data={'password': password, 'email': email})
+    response = client.post('/api/auth/token/login/',
+                           data={'password': password, 'email': email})
     token = response.json()['auth_token']
-    api_client.credentials(HTTP_AUTHORIZATION=f'Token {token}')
-    return api_client
+    client.credentials(HTTP_AUTHORIZATION=f'Token {token}')
+    return client
+
+
+@pytest.fixture
+def api_another_user_client(db, api_another_user):
+    client = APIClient()
+    password, email = api_another_user
+    response = client.post('/api/auth/token/login/',
+                           data={'password': password, 'email': email})
+    token = response.json()['auth_token']
+    client.credentials(HTTP_AUTHORIZATION=f'Token {token}')
+    return client
 
 
 @pytest.fixture

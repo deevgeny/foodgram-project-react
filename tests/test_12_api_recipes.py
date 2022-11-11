@@ -104,6 +104,9 @@ def test_create_recipe(api_user_client, ingredient, tag):
     data = {
         'ingredients': [{'id': ingredient.id, 'amount': 10}],
         'tags': [tag.id],
+        'image': ('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMA'
+                  'AABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxA'
+                  'GVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg=='),
         'name': 'Test recipe',
         'text': 'Test recipe description',
         'cooking_time': 5
@@ -125,7 +128,7 @@ def test_create_recipe(api_user_client, ingredient, tag):
         f'POST request to {RECIPES_URL} should return response with '
         f'{len(fields)} fields'
     )
-    # Check field namdes in response
+    # Check field names in response
     for field in fields:
         assert field in response.data, (
             f'Field name `{field}` is missing or incorrect in response '
@@ -164,3 +167,171 @@ def test_create_recipe(api_user_client, ingredient, tag):
             f'Field name `{field}` is missing or incorrect inside response '
             f'ingredients field after POST request to {RECIPES_URL}'
         )
+
+
+@pytest.mark.django_db
+def test_patch_recipe_by_author(api_user_client, recipe, create_five_tags,
+                                create_five_ingredients):
+    data = {
+        'ingredients': [
+            {'id': i.id, 'amount': 10} for i in create_five_ingredients
+        ],
+        'tags': [i.id for i in create_five_tags],
+        'image': ('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMA'
+                  'AABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxA'
+                  'GVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg=='),
+        'name': 'New name',
+        'text': 'New text',
+        'cooking_time': 100
+    }
+    # Check that recipe does not have image
+    assert recipe.image.name == '', (
+        'Recipe.image field should be empty before running patch test'
+    )
+    response = api_user_client.patch(RECIPES_URL + f'{recipe.id}/', data=data,
+                                     format='json')
+    assert response.status_code == HTTPStatus.OK, (
+        f'Incorrect response status code {response.status_code} for '
+        f'successful PATCH request to {RECIPES_URL}'
+    )
+    # Check recipe in database
+    check_fields = ['name', 'text', 'cooking_time']
+    response = api_user_client.get(RECIPES_URL + f'{recipe.id}/')
+    assert response.status_code == HTTPStatus.OK, (
+        'Could not get recipe from database via api request to check fields'
+    )
+    for field in check_fields:
+        assert response.data[field] == data[field], (
+            f'Recipe.{field} field was not updated'
+        )
+    assert response.data['image'] is not None, (
+        'Recipe.image field was not updated'
+    )
+    assert len(response.data['ingredients']) == len(data['ingredients']), (
+        'Recipe.ingredients field was not updated'
+    )
+    assert len(response.data['tags']) == len(data['tags']), (
+        'Recipe.tags field was not updated'
+    )
+
+
+@pytest.mark.django_db
+def test_patch_recipe_by_another_author(api_another_user_client, recipe,
+                                        create_five_tags,
+                                        create_five_ingredients):
+    data = {
+        'ingredients': [
+            {'id': i.id, 'amount': 10} for i in create_five_ingredients
+        ],
+        'tags': [i.id for i in create_five_tags],
+        'image': ('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMA'
+                  'AABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxA'
+                  'GVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg=='),
+        'name': 'New name',
+        'text': 'New text',
+        'cooking_time': 100
+    }
+    # Check that recipe does not have image
+    assert recipe.image.name == '', (
+        'Recipe.image field should be empty before running patch test'
+    )
+    response = api_another_user_client.patch(RECIPES_URL + f'{recipe.id}/',
+                                             data=data, format='json')
+    assert response.status_code == HTTPStatus.FORBIDDEN, (
+        'Recipe can be update only by author'
+    )
+    # Check recipe in database
+    check_fields = ['name', 'text', 'cooking_time']
+    response = api_another_user_client.get(RECIPES_URL + f'{recipe.id}/')
+    assert response.status_code == HTTPStatus.OK, (
+        'Could not get recipe from database via api request to check fields'
+    )
+    for field in check_fields:
+        assert response.data[field] != data[field], (
+            f'Recipe.{field} field was updated by another user'
+        )
+    assert response.data['image'] is None, (
+        'Recipe.image field was updated by another user'
+    )
+    assert len(response.data['ingredients']) != len(data['ingredients']), (
+        'Recipe.ingredients field was updated by another user'
+    )
+    assert len(response.data['tags']) != len(data['tags']), (
+        'Recipe.tags field was updated by another user'
+    )
+
+
+@pytest.mark.django_db
+def test_patch_recipe_by_unauthorized_user(api_client, recipe,
+                                           create_five_tags,
+                                           create_five_ingredients):
+    data = {
+        'ingredients': [
+            {'id': i.id, 'amount': 10} for i in create_five_ingredients
+        ],
+        'tags': [i.id for i in create_five_tags],
+        'image': ('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMA'
+                  'AABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxA'
+                  'GVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg=='),
+        'name': 'New name',
+        'text': 'New text',
+        'cooking_time': 100
+    }
+    # Check that recipe does not have image
+    assert recipe.image.name == '', (
+        'Recipe.image field should be empty before running patch test'
+    )
+    response = api_client.patch(RECIPES_URL + f'{recipe.id}/', data=data,
+                                format='json')
+    assert response.status_code == HTTPStatus.UNAUTHORIZED, (
+        'Recipe can be update only by author'
+    )
+    # Check recipe in database
+    check_fields = ['name', 'text', 'cooking_time']
+    response = api_client.get(RECIPES_URL + f'{recipe.id}/')
+    assert response.status_code == HTTPStatus.OK, (
+        'Could not get recipe from database via api request to check fields'
+    )
+    for field in check_fields:
+        assert response.data[field] != data[field], (
+            f'Recipe.{field} field was updated by unauthorized user'
+        )
+    assert response.data['image'] is None, (
+        'Recipe.image field was updated by unauthorized user'
+    )
+    assert len(response.data['ingredients']) != len(data['ingredients']), (
+        'Recipe.ingredients field was updated by unauthorized user'
+    )
+    assert len(response.data['tags']) != len(data['tags']), (
+        'Recipe.tags field was updated by unauthorized user'
+    )
+
+
+@pytest.mark.django_db
+def test_delete_recipe_by_author(api_user_client, recipe):
+    response = api_user_client.delete(RECIPES_URL + f'{recipe.id}/')
+    assert response.status_code == HTTPStatus.NO_CONTENT, (
+        f'Incorrect response status code {response.status_code} for '
+        f'successful DELETE request to {RECIPES_URL}'
+    )
+    # Check recipe was deleted from database
+    response = api_user_client.get(RECIPES_URL + f'{recipe.id}/')
+    assert response.status_code == HTTPStatus.NOT_FOUND, (
+        'Recipe was not deleted from database'
+    )
+
+
+@pytest.mark.django_db
+def test_delete_recipe_by_another_user(recipe, api_another_user_client):
+    response = api_another_user_client.delete(RECIPES_URL + f'{recipe.id}/')
+    assert response.status_code == HTTPStatus.FORBIDDEN, (
+        'Recipes can be deleted only by author'
+    )
+
+
+@pytest.mark.django_db
+def test_delete_recipe_by_unauthorized_user(api_client, recipe):
+    response = api_client.delete(RECIPES_URL + f'{recipe.id}/')
+    assert response.status_code == HTTPStatus.UNAUTHORIZED, (
+        'Unauthorized user should not have permission to delete recipes'
+    )

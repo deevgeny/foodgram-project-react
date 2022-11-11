@@ -136,3 +136,7 @@ dmypy.json
 .pre-commit-config.yaml
 isort.cfg
 pyproject.toml
+
+
+# images dir
+images
