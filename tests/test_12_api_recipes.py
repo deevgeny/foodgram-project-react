@@ -1,6 +1,8 @@
 from http import HTTPStatus
+from pathlib import Path
 
 import pytest
+from recipes.models import Recipe
 
 RECIPES_URL = '/api/recipes/'
 
@@ -100,7 +102,7 @@ def test_api_response_ingredients_field_content(api_client, create_recipe):
 
 
 @pytest.mark.django_db
-def test_create_recipe(api_user_client, ingredient, tag):
+def test_create_recipe_by_authorized_user(api_user_client, ingredient, tag):
     data = {
         'ingredients': [{'id': ingredient.id, 'amount': 10}],
         'tags': [tag.id],
@@ -167,16 +169,39 @@ def test_create_recipe(api_user_client, ingredient, tag):
             f'Field name `{field}` is missing or incorrect inside response '
             f'ingredients field after POST request to {RECIPES_URL}'
         )
+    # Clean up image files
+    obj = Recipe.objects.get(id=response.data['id'])
+    path = Path('.').joinpath(obj.image.name)
+    path.unlink()
 
 
 @pytest.mark.django_db
-def test_patch_recipe_by_author(api_user_client, recipe, create_five_tags,
+def test_create_recipe_by_unauthenticated_user(api_client, ingredient, tag):
+    data = {
+        'ingredients': [{'id': ingredient.id, 'amount': 10}],
+        'tags': [tag.id],
+        'image': ('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMA'
+                  'AABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxA'
+                  'GVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg=='),
+        'name': 'Test recipe',
+        'text': 'Test recipe description',
+        'cooking_time': 5
+    }
+    response = api_client.post(RECIPES_URL, data=data, format='json')
+    # Check response status
+    assert response.status_code == HTTPStatus.UNAUTHORIZED, (
+        'Only authorized users can create recipes'
+    )
+
+
+@pytest.mark.django_db
+def test_patch_recipe_by_author(api_user_client, recipe, five_tags,
                                 create_five_ingredients):
     data = {
         'ingredients': [
             {'id': i.id, 'amount': 10} for i in create_five_ingredients
         ],
-        'tags': [i.id for i in create_five_tags],
+        'tags': [i.id for i in five_tags],
         'image': ('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMA'
                   'AABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxA'
                   'GVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg=='),
@@ -213,17 +238,20 @@ def test_patch_recipe_by_author(api_user_client, recipe, create_five_tags,
     assert len(response.data['tags']) == len(data['tags']), (
         'Recipe.tags field was not updated'
     )
+    # Clean up image files
+    obj = Recipe.objects.get(id=response.data['id'])
+    path = Path('.').joinpath(obj.image.name)
+    path.unlink()
 
 
 @pytest.mark.django_db
 def test_patch_recipe_by_another_author(api_another_user_client, recipe,
-                                        create_five_tags,
-                                        create_five_ingredients):
+                                        five_tags, create_five_ingredients):
     data = {
         'ingredients': [
             {'id': i.id, 'amount': 10} for i in create_five_ingredients
         ],
-        'tags': [i.id for i in create_five_tags],
+        'tags': [i.id for i in five_tags],
         'image': ('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMA'
                   'AABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxA'
                   'GVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg=='),
@@ -262,14 +290,13 @@ def test_patch_recipe_by_another_author(api_another_user_client, recipe,
 
 
 @pytest.mark.django_db
-def test_patch_recipe_by_unauthorized_user(api_client, recipe,
-                                           create_five_tags,
-                                           create_five_ingredients):
+def test_patch_recipe_by_unauthenticated_user(api_client, recipe, five_tags,
+                                              create_five_ingredients):
     data = {
         'ingredients': [
             {'id': i.id, 'amount': 10} for i in create_five_ingredients
         ],
-        'tags': [i.id for i in create_five_tags],
+        'tags': [i.id for i in five_tags],
         'image': ('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMA'
                   'AABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxA'
                   'GVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg=='),
@@ -294,16 +321,16 @@ def test_patch_recipe_by_unauthorized_user(api_client, recipe,
     )
     for field in check_fields:
         assert response.data[field] != data[field], (
-            f'Recipe.{field} field was updated by unauthorized user'
+            f'Recipe.{field} field was updated by unauthenticated user'
         )
     assert response.data['image'] is None, (
-        'Recipe.image field was updated by unauthorized user'
+        'Recipe.image field was updated by unauthenticated user'
     )
     assert len(response.data['ingredients']) != len(data['ingredients']), (
-        'Recipe.ingredients field was updated by unauthorized user'
+        'Recipe.ingredients field was updated by unauthenticated user'
     )
     assert len(response.data['tags']) != len(data['tags']), (
-        'Recipe.tags field was updated by unauthorized user'
+        'Recipe.tags field was updated by unauthenticated user'
     )
 
 
@@ -330,7 +357,7 @@ def test_delete_recipe_by_another_user(recipe, api_another_user_client):
 
 
 @pytest.mark.django_db
-def test_delete_recipe_by_unauthorized_user(api_client, recipe):
+def test_delete_recipe_by_unauthenticated_user(api_client, recipe):
     response = api_client.delete(RECIPES_URL + f'{recipe.id}/')
     assert response.status_code == HTTPStatus.UNAUTHORIZED, (
         'Unauthorized user should not have permission to delete recipes'

@@ -67,13 +67,17 @@ def api_another_user_client(db, api_another_user):
 
 
 @pytest.fixture
-def create_five_users(db):
+def five_users(db):
     base = ['one', 'two', 'three', 'four', 'five']
+    users = []
     for idx, val in enumerate(base):
-        User.objects.create_user(
-            email=f'{val}@fake.com',
-            username=val,
-            first_name=val,
-            last_name=val,
-            password=f'superpass{val}'
+        users.append(
+            User.objects.create_user(
+                email=f'{val}@fake.com',
+                username=val,
+                first_name=val,
+                last_name=val,
+                password=f'superpass{idx}'
+            )
         )
+    return users

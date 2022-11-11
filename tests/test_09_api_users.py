@@ -19,7 +19,7 @@ NOT_FOUND_URLS = [
 
 
 @pytest.mark.django_db
-def test_url_availability(api_client, api_user, create_five_users):
+def test_url_availability(api_client, api_user, five_users):
     response = api_client.get(USERS_URL)
     assert response.status_code != HTTPStatus.NOT_FOUND, (
         f'URL {USERS_URL} not found'
@@ -214,7 +214,7 @@ def test_users_list_authorized(api_user_client):
 
 
 @pytest.mark.django_db
-def test_users_list_pagination_unauthorized(api_client, create_five_users):
+def test_users_list_pagination_unauthorized(api_client, five_users):
     data = {'limit': 1}
     response = api_client.get(USERS_URL, data=data)
     assert response.status_code == HTTPStatus.OK, (
@@ -245,7 +245,7 @@ def test_user_info_by_id_unauthorized(api_client):
 
 
 @pytest.mark.django_db
-def test_user_info_by_id_authorized(api_user_client, create_five_users):
+def test_user_info_by_id_authorized(api_user_client, five_users):
     response = api_user_client.get(USERS_URL + '5/')
     assert response.status_code == HTTPStatus.OK, (
         f'Incorrect response status code {response.status_code}, '
@@ -255,7 +255,7 @@ def test_user_info_by_id_authorized(api_user_client, create_five_users):
 
 @pytest.mark.django_db
 def test_not_existing_user_info_by_id_authorized(
-    api_user_client, create_five_users
+    api_user_client, five_users
 ):
     response = api_user_client.get(USERS_URL + '10/')
     assert response.status_code == HTTPStatus.NOT_FOUND, (

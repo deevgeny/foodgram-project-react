@@ -20,6 +20,25 @@ def recipe(db, api_user, tag):
 
 
 @pytest.fixture
+def five_recipes(db, five_users, five_tags):
+    users = five_users
+    tags = five_tags
+    recipes = []
+    for i in range(len(users)):
+        recipes.append(
+            Recipe.objects.create(
+                author=users[i],
+                name=f'Test recipe {i}',
+                text=f'Test text {i}',
+                cooking_time=10
+            )
+        )
+    for i in range(len(recipes)):
+        recipes[i].tags.add(tags[i])
+    return recipes
+
+
+@pytest.fixture
 def create_recipe(db, user, tag, create_five_ingredient_amounts):
     obj = Recipe.objects.create(
         author=user,

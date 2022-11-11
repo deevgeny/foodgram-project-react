@@ -12,7 +12,7 @@ def tag(db):
 
 
 @pytest.fixture
-def create_five_tags(db):
+def five_tags(db):
     tag_names = ['one', 'two', 'tree', 'four', 'five']
     colors = ['#111111', '#222222', '#333333', '#444444', '#555555']
     tags = []

@@ -6,7 +6,7 @@ TAG_URL = '/api/tags/'
 
 
 @pytest.mark.django_db
-def test_urls_availability(api_client, create_five_tags):
+def test_urls_availability(api_client, five_tags):
     response = api_client.get(TAG_URL)
     assert response.status_code != HTTPStatus.NOT_FOUND, (
         f'URL {TAG_URL} not found'
@@ -18,7 +18,7 @@ def test_urls_availability(api_client, create_five_tags):
 
 
 @pytest.mark.django_db
-def test_urls_unauthenticated_permissions(api_client, create_five_tags):
+def test_urls_unauthenticated_permissions(api_client, five_tags):
     response = api_client.get(TAG_URL)
     assert response.status_code == HTTPStatus.OK, (
         f'GET request to {TAG_URL} should be available for all users'
@@ -30,7 +30,7 @@ def test_urls_unauthenticated_permissions(api_client, create_five_tags):
 
 
 @pytest.mark.django_db
-def test_tags_have_no_pagination(api_client, create_five_tags):
+def test_tags_have_no_pagination(api_client, five_tags):
     response = api_client.get(TAG_URL)
     assert 'count' not in response.data, (
         f'URL {TAG_URL} should not have pagination'
@@ -38,7 +38,7 @@ def test_tags_have_no_pagination(api_client, create_five_tags):
 
 
 @pytest.mark.django_db
-def test_api_response_fields(api_client, create_five_tags):
+def test_api_response_fields(api_client, five_tags):
     fields = ['id', 'name', 'color', 'slug']
     response = api_client.get(TAG_URL + '1/')
     assert len(response.data) == len(fields), (
@@ -69,7 +69,7 @@ def test_tag_post_method(api_user_client):
 
 
 @pytest.mark.django_db
-def test_tag_delete_method(api_user_client, create_five_tags):
+def test_tag_delete_method(api_user_client, five_tags):
     response = api_user_client.patch(TAG_URL + '1/')
     assert response.status_code == HTTPStatus.METHOD_NOT_ALLOWED, (
         f'PATCH method should not be allowed on url {TAG_URL + "1/"}'
@@ -77,7 +77,7 @@ def test_tag_delete_method(api_user_client, create_five_tags):
 
 
 @pytest.mark.django_db
-def test_tag_delete_method(api_user_client, create_five_tags):
+def test_tag_delete_method(api_user_client, five_tags):
     response = api_user_client.delete(TAG_URL + '1/')
     assert response.status_code == HTTPStatus.METHOD_NOT_ALLOWED, (
         f'DELETE method should not be allowed on url {TAG_URL + "1/"}'
