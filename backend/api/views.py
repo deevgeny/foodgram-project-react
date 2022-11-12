@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
-from django.core.exceptions import MultipleObjectsReturned
 from django.http import HttpResponse
-from django.shortcuts import get_list_or_404, get_object_or_404
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser import utils
 from djoser.conf import settings
@@ -26,6 +25,7 @@ from rest_framework.permissions import (
     IsAuthenticatedOrReadOnly,
 )
 from rest_framework.response import Response
+from rest_framework.serializers import ValidationError
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
@@ -122,13 +122,16 @@ class RecipeViewSet(ModelViewSet):
     def actions_delete_method(request, pk, model):
         user = request.user
         recipe = get_object_or_404(Recipe, id=pk)
-        try:
-            model_obj = get_object_or_404(model, user=user, recipe=recipe)
-            model_obj.delete()
-        except MultipleObjectsReturned:
-            model_obj = get_list_or_404(model, user=user, recipe=recipe)
-            for obj in model_obj:
-                obj.delete()
+        if model == ShoppingCart:
+            if ShoppingCart.objects.filter(user=user, recipe=recipe).exists():
+                ShoppingCart.objects.filter(user=user, recipe=recipe).delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            else:
+                raise ValidationError({
+                    'errors': 'recipe does not exist in shopping cart'
+                })
+        model_obj = get_object_or_404(model, user=user, recipe=recipe)
+        model_obj.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=True, methods=["POST"],
