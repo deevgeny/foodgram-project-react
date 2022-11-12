@@ -8,7 +8,7 @@ def unit(db):
 
 
 @pytest.fixture
-def create_five_units(db):
+def five_units(db):
     names = ['kg', 'gr', 'pcs', 'ltr', 'cup']
     units = []
     for name in names:

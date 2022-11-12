@@ -8,7 +8,7 @@ RECIPES_URL = '/api/recipes/'
 
 
 @pytest.mark.django_db
-def test_urls_availability(api_client, create_recipe):
+def test_urls_availability(api_client, recipe):
     response = api_client.get(RECIPES_URL)
     assert response.status_code != HTTPStatus.NOT_FOUND, (
         f'URL {RECIPES_URL} not found'
@@ -20,7 +20,7 @@ def test_urls_availability(api_client, create_recipe):
 
 
 @pytest.mark.django_db
-def test_urls_unauthenticated_permissions(api_client, create_recipe):
+def test_urls_unauthenticated_permissions(api_client, recipe):
     response = api_client.get(RECIPES_URL)
     assert response.status_code == HTTPStatus.OK, (
         f'GET request to {RECIPES_URL} should be available for all users'
@@ -38,7 +38,7 @@ def test_urls_unauthenticated_permissions(api_client, create_recipe):
 
 
 @pytest.mark.django_db
-def test_api_response_fields(api_client, create_recipe):
+def test_api_response_fields(api_client, recipe):
     fields = [
         'id', 'tags', 'author', 'ingredients', 'is_favorited',
         'is_in_shopping_cart', 'name', 'image', 'text', 'cooking_time'
@@ -56,7 +56,7 @@ def test_api_response_fields(api_client, create_recipe):
 
 
 @pytest.mark.django_db
-def test_api_response_tag_field_content(api_client, create_recipe):
+def test_api_response_tag_field_content(api_client, recipe):
     fields = ['id', 'name', 'color', 'slug']
     response = api_client.get(RECIPES_URL + '1/')
     assert len(response.data['tags'][0]) == len(fields), (
@@ -71,7 +71,7 @@ def test_api_response_tag_field_content(api_client, create_recipe):
 
 
 @pytest.mark.django_db
-def test_api_response_author_field_content(api_client, create_recipe):
+def test_api_response_author_field_content(api_client, recipe):
     fields = ['email', 'id', 'username', 'first_name', 'last_name',
               'is_subscribed']
     response = api_client.get(RECIPES_URL + '1/')
@@ -87,7 +87,8 @@ def test_api_response_author_field_content(api_client, create_recipe):
 
 
 @pytest.mark.django_db
-def test_api_response_ingredients_field_content(api_client, create_recipe):
+def test_api_response_ingredients_field_content(api_client,
+                                                five_ingredient_amounts):
     fields = ['id', 'name', 'measurement_unit', 'amount']
     response = api_client.get(RECIPES_URL + '1/')
     assert len(response.data['ingredients'][0]) == len(fields), (
@@ -196,10 +197,10 @@ def test_create_recipe_by_unauthenticated_user(api_client, ingredient, tag):
 
 @pytest.mark.django_db
 def test_patch_recipe_by_author(api_user_client, recipe, five_tags,
-                                create_five_ingredients):
+                                five_ingredients):
     data = {
         'ingredients': [
-            {'id': i.id, 'amount': 10} for i in create_five_ingredients
+            {'id': i.id, 'amount': 10} for i in five_ingredients
         ],
         'tags': [i.id for i in five_tags],
         'image': ('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMA'
@@ -246,10 +247,10 @@ def test_patch_recipe_by_author(api_user_client, recipe, five_tags,
 
 @pytest.mark.django_db
 def test_patch_recipe_by_another_author(api_another_user_client, recipe,
-                                        five_tags, create_five_ingredients):
+                                        five_tags, five_ingredients):
     data = {
         'ingredients': [
-            {'id': i.id, 'amount': 10} for i in create_five_ingredients
+            {'id': i.id, 'amount': 10} for i in five_ingredients
         ],
         'tags': [i.id for i in five_tags],
         'image': ('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMA'
@@ -291,10 +292,10 @@ def test_patch_recipe_by_another_author(api_another_user_client, recipe,
 
 @pytest.mark.django_db
 def test_patch_recipe_by_unauthenticated_user(api_client, recipe, five_tags,
-                                              create_five_ingredients):
+                                              five_ingredients):
     data = {
         'ingredients': [
-            {'id': i.id, 'amount': 10} for i in create_five_ingredients
+            {'id': i.id, 'amount': 10} for i in five_ingredients
         ],
         'tags': [i.id for i in five_tags],
         'image': ('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMA'

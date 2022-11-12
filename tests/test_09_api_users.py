@@ -19,7 +19,7 @@ NOT_FOUND_URLS = [
 
 
 @pytest.mark.django_db
-def test_url_availability(api_client, api_user, five_users):
+def test_url_availability(api_client, api_user, api_five_users):
     response = api_client.get(USERS_URL)
     assert response.status_code != HTTPStatus.NOT_FOUND, (
         f'URL {USERS_URL} not found'
@@ -133,9 +133,9 @@ def test_user_registration_with_bad_data(api_client):
 
 @pytest.mark.django_db()
 def test_user_login(api_client, api_user):
-    password, email = api_user
+    user, password = api_user
     response = api_client.post(
-        LOGIN_URL, data={'password': password, 'email': email}
+        LOGIN_URL, data={'password': password, 'email': user.email}
     )
     assert 'auth_token' in response.data, (
         'Authorization token is missing in response'
@@ -165,7 +165,7 @@ def test_user_logout(api_user_client):
 
 @pytest.mark.django_db
 def test_user_change_password(api_user, api_user_client):
-    password, email = api_user
+    user, password = api_user
     data = {'new_password': 'MyNewVeryStrongPassword',
             'current_password': password}
     response = api_user_client.post(CHANGE_PASSWORD_URL, data=data)
@@ -214,7 +214,7 @@ def test_users_list_authorized(api_user_client):
 
 
 @pytest.mark.django_db
-def test_users_list_pagination_unauthorized(api_client, five_users):
+def test_users_list_pagination_unauthorized(api_client, api_five_users):
     data = {'limit': 1}
     response = api_client.get(USERS_URL, data=data)
     assert response.status_code == HTTPStatus.OK, (
@@ -228,11 +228,9 @@ def test_users_list_pagination_unauthorized(api_client, five_users):
             'PageNumberPaginator should be overiden with '
             'page_size_query_param="limit"'
         )
-    else:
-        assert response.data['next'], (
-            'PageNumberPaginator should be overiden with '
-            'page_size_query_param="limit"'
-        )
+    assert len(response.data['results']) == data['limit'], (
+        f'Incorrect work of pagination with data={data}'
+    )
 
 
 @pytest.mark.django_db
@@ -245,7 +243,7 @@ def test_user_info_by_id_unauthorized(api_client):
 
 
 @pytest.mark.django_db
-def test_user_info_by_id_authorized(api_user_client, five_users):
+def test_user_info_by_id_authorized(api_user_client, api_five_users):
     response = api_user_client.get(USERS_URL + '5/')
     assert response.status_code == HTTPStatus.OK, (
         f'Incorrect response status code {response.status_code}, '
@@ -255,7 +253,7 @@ def test_user_info_by_id_authorized(api_user_client, five_users):
 
 @pytest.mark.django_db
 def test_not_existing_user_info_by_id_authorized(
-    api_user_client, five_users
+    api_user_client, api_five_users
 ):
     response = api_user_client.get(USERS_URL + '10/')
     assert response.status_code == HTTPStatus.NOT_FOUND, (
@@ -275,14 +273,14 @@ def test_current_user_info_unauthorized(api_client):
 
 @pytest.mark.django_db
 def test_current_user_info_authorized(api_user, api_user_client):
-    password, email = api_user
+    user, _ = api_user
     response = api_user_client.get(CURRENT_USER_URL)
     assert response.status_code == HTTPStatus.OK, (
         f'Incorrect response status code {response.status_code}, '
         'current user information should be available for '
         'authorized users only'
     )
-    assert response.data['email'] == email, (
+    assert response.data['email'] == user.email, (
         f'Incorrect current user information on {CURRENT_USER_URL}'
     )
 

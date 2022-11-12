@@ -8,8 +8,8 @@ def ingredient(db, unit):
 
 
 @pytest.fixture
-def create_five_ingredients(db, create_five_units):
-    units = create_five_units
+def five_ingredients(db, five_units):
+    units = five_units
     names = ['potato', 'sheese', 'apple', 'milk', 'sugar']
     ingredients = []
     for i in zip(names, units):

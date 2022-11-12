@@ -229,7 +229,10 @@ class SubscriptionSerializer(CustomUserReadSerializer):
     def get_recipes(self, obj):
         request = self.context.get('request')
         recipes = obj.recipes.all()
-        recipes_limit = request.query_params.get('recipes_limit')
+        if request.method == 'GET':
+            recipes_limit = request.query_params.get('recipes_limit')
+        else:
+            recipes_limit = request.data.get('recipes_limit')
         if recipes_limit:
             recipes = recipes[:int(recipes_limit)]
         return ShortSummaryRecipeSerializer(recipes, many=True).data

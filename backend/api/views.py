@@ -111,6 +111,7 @@ class RecipeViewSet(ModelViewSet):
 
     @staticmethod
     def actions_post_method(request, pk, serializer_class):
+        '''Reusable function for actions post methods.'''
         data = {'user': request.user.id, 'recipe': pk}
         serializer = serializer_class(data=data, context={'request': request})
         serializer.is_valid(raise_exception=True)

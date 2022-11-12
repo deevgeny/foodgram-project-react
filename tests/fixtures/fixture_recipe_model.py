@@ -7,8 +7,7 @@ User = get_user_model()
 
 @pytest.fixture
 def recipe(db, api_user, tag):
-    _, email = api_user
-    user = User.objects.get(email=email)
+    user, _ = api_user
     obj = Recipe.objects.create(
         author=user,
         name='Test recipe',
@@ -20,8 +19,8 @@ def recipe(db, api_user, tag):
 
 
 @pytest.fixture
-def five_recipes(db, five_users, five_tags):
-    users = five_users
+def five_recipes(db, api_five_users, five_tags):
+    users = api_five_users
     tags = five_tags
     recipes = []
     for i in range(len(users)):
@@ -39,12 +38,19 @@ def five_recipes(db, five_users, five_tags):
 
 
 @pytest.fixture
-def create_recipe(db, user, tag, create_five_ingredient_amounts):
-    obj = Recipe.objects.create(
-        author=user,
-        name='recipe',
-        text='Text',
-        cooking_time=10
-    )
-    obj.tags.add(tag)
-    return obj
+def another_user_five_recipes(db, api_another_user, five_tags):
+    another_user, _ = api_another_user
+    tags = five_tags
+    recipes = []
+    for i in range(5):
+        recipes.append(
+            Recipe.objects.create(
+                author=another_user,
+                name=f'Test recipe {i}',
+                text=f'Test text {i}',
+                cooking_time=10
+            )
+        )
+    for recipe, tag in zip(recipes, tags):
+        recipe.tags.add(tag)
+    return recipes

@@ -15,6 +15,5 @@ def shopping_cart(db, user, recipe):
 
 @pytest.fixture
 def api_user_one_recipe_in_shopping_cart(db, api_user, five_recipes):
-    _, email = api_user
-    user = User.objects.get(email=email)
+    user, _ = api_user
     return ShoppingCart.objects.create(user=user, recipe=five_recipes[0])

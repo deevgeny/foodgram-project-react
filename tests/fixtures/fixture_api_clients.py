@@ -13,43 +13,36 @@ def api_client():
 
 @pytest.fixture
 def api_user(db):
-    client = APIClient()
-    data = {
-        'email': 'user@fake.com',
-        'username': 'user',
-        'first_name': 'Vasya',
-        'last_name': 'Pupkin',
-        'password': 'VeryStrongPassword'
-    }
-    client.post('/api/users/', data=data)
-    return data['password'], data['email']
+    password = 'VeryStrongPassword'
+    user = User.objects.create_user(
+        email='vasek@fake.com',
+        username='vasek',
+        first_name='Vasya',
+        last_name='Pupkin',
+        password=password
+    )
+    return user, password
 
 
 @pytest.fixture
 def api_another_user(db):
-    data = {
-        'email': 'anotheruser@fake.com',
-        'username': 'anotheruser',
-        'first_name': 'AnotherVasya',
-        'last_name': 'AnotherPupkin',
-        'password': 'VeryStrongPassword'
-    }
-    User.objects.create_user(
-        email=data['email'],
-        username=data['username'],
-        first_name=data['first_name'],
-        last_name=data['last_name'],
-        password=data['password']
+    password = 'VeryStrongPassword'
+    user = User.objects.create_user(
+        email='kolyanchikus@fake.com',
+        username='kolyanchikus',
+        first_name='Kolya',
+        last_name='Kozyavkin',
+        password=password
     )
-    return data['password'], data['email']
+    return user, password
 
 
 @pytest.fixture
 def api_user_client(db, api_user):
     client = APIClient()
-    password, email = api_user
+    user, password = api_user
     response = client.post('/api/auth/token/login/',
-                           data={'password': password, 'email': email})
+                           data={'password': password, 'email': user.email})
     token = response.json()['auth_token']
     client.credentials(HTTP_AUTHORIZATION=f'Token {token}')
     return client
@@ -58,16 +51,17 @@ def api_user_client(db, api_user):
 @pytest.fixture
 def api_another_user_client(db, api_another_user):
     client = APIClient()
-    password, email = api_another_user
+    another_user, password = api_another_user
     response = client.post('/api/auth/token/login/',
-                           data={'password': password, 'email': email})
+                           data={'password': password,
+                                 'email': another_user.email})
     token = response.json()['auth_token']
     client.credentials(HTTP_AUTHORIZATION=f'Token {token}')
     return client
 
 
 @pytest.fixture
-def five_users(db):
+def api_five_users(db):
     base = ['one', 'two', 'three', 'four', 'five']
     users = []
     for idx, val in enumerate(base):

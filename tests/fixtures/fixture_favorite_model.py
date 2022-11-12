@@ -15,6 +15,5 @@ def favorite(db, user, recipe):
 
 @pytest.fixture
 def api_user_one_favorite_recipe(db, api_user, five_recipes):
-    _, email = api_user
-    user = User.objects.get(email=email)
+    user, _ = api_user
     return Favorite.objects.create(user=user, recipe=five_recipes[0])

@@ -33,7 +33,7 @@ def test_recipe_filter_by_is_favorited(api_user_client,
                                        api_user_one_favorite_recipe):
     data = {'is_favorited': 1}
     response = api_user_client.get(RECIPES_URL, data=data)
-    assert len(response.data['results']) == 1, (
+    assert len(response.data['results']) == data['is_favorited'], (
         f'Incorrect work of is_favorited filter with data={data}'
     )
 
