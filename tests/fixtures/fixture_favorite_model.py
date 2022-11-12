@@ -6,7 +6,8 @@ User = get_user_model()
 
 
 @pytest.fixture
-def favorite(db, user, recipe):
+def favorite(db, api_user, recipe):
+    user, _ = api_user
     return Favorite.objects.create(
         user=user,
         recipe=recipe
