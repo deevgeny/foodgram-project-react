@@ -120,6 +120,7 @@ class RecipeViewSet(ModelViewSet):
 
     @staticmethod
     def actions_delete_method(request, pk, model):
+        '''Reusable function for actions delete methods.'''
         user = request.user
         recipe = get_object_or_404(Recipe, id=pk)
         if model == ShoppingCart:
@@ -175,7 +176,7 @@ class RecipeViewSet(ModelViewSet):
             else:
                 final_list[name]['amount'] += item[2]
         pdfmetrics.registerFont(
-            TTFont('Handicraft', 'data/Handicraft.ttf', 'UTF-8'))
+            TTFont('Handicraft', './data/font.ttf', 'UTF-8'))
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = ('attachment; '
                                            'filename="shopping_list.pdf"')
