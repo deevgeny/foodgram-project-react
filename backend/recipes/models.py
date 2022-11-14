@@ -89,7 +89,6 @@ class Ingredient(models.Model):
         max_length=200,
         verbose_name=_('ingredient name'),
         db_index=True,
-        unique=True,
     )
     measurement_unit = models.ForeignKey(
         Unit,
@@ -101,6 +100,13 @@ class Ingredient(models.Model):
     class Meta:
         verbose_name = _('ingredient')
         verbose_name_plural = _('ingredients')
+        constraints = [
+            models.UniqueConstraint(
+                fields=['name', 'measurement_unit'],
+                name=('Ingredient unique together constraint fields: '
+                      'name, measurement_unit')
+            )
+        ]
 
     def __str__(self):
         return f'{self.name} {self.measurement_unit}'
