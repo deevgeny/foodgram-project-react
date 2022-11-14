@@ -1,19 +1,11 @@
 from django.contrib.auth import get_user_model
+from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser import utils
 from djoser.conf import settings
 from djoser.views import TokenCreateView
-from recipes.models import (
-    Favorite,
-    Ingredient,
-    IngredientAmount,
-    Recipe,
-    ShoppingCart,
-    Subscription,
-    Tag,
-)
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
@@ -41,15 +33,24 @@ from .serializers import (
     SubscriptionSerializer,
     TagSerializer,
 )
+from recipes.models import (
+    Favorite,
+    Ingredient,
+    IngredientAmount,
+    Recipe,
+    ShoppingCart,
+    Subscription,
+    Tag,
+)
 
 User = get_user_model()
 
 
 class CustomTokenCreateView(TokenCreateView):
-    '''Custom Token create view.
+    """Custom Token create view.
 
     Override response status code from 200_OK to 201_CREATED.
-    '''
+    """
 
     def _action(self, serializer):
         token = utils.login_user(self.request, serializer.user)
@@ -61,11 +62,11 @@ class CustomTokenCreateView(TokenCreateView):
 
 
 class TagViewSet(ReadOnlyModelViewSet):
-    '''Tag model viewset.
+    """Tag model viewset.
 
     * GET method - list(), retrieve()
     * no pagination.
-    '''
+    """
 
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
@@ -74,11 +75,11 @@ class TagViewSet(ReadOnlyModelViewSet):
 
 
 class IngredientViewSet(ReadOnlyModelViewSet):
-    '''Ingredient model viewset.
+    """Ingredient model viewset.
 
     * GET method - list(), retrieve().
     * Search filter by Ingredient.name field.
-    '''
+    """
 
     from rest_framework.filters import SearchFilter
     queryset = Ingredient.objects.all()
@@ -90,13 +91,13 @@ class IngredientViewSet(ReadOnlyModelViewSet):
 
 
 class RecipeViewSet(ModelViewSet):
-    '''Recipe model viewset.
+    """Recipe model viewset.
 
     * GET method - list(), retrive().
     * POST method - create().
     * PATCH method - partial_update().
     * DELETE method - destroy().
-    '''
+    """
 
     queryset = Recipe.objects.all()
     permission_classes = [IsAuthorIsAdminOrReadOnly]
@@ -111,7 +112,7 @@ class RecipeViewSet(ModelViewSet):
 
     @staticmethod
     def actions_post_method(request, pk, serializer_class):
-        '''Reusable function for actions post methods.'''
+        """Reusable function for actions post methods."""
         data = {'user': request.user.id, 'recipe': pk}
         serializer = serializer_class(data=data, context={'request': request})
         serializer.is_valid(raise_exception=True)
@@ -120,7 +121,7 @@ class RecipeViewSet(ModelViewSet):
 
     @staticmethod
     def actions_delete_method(request, pk, model):
-        '''Reusable function for actions delete methods.'''
+        """Reusable function for actions delete methods."""
         user = request.user
         recipe = get_object_or_404(Recipe, id=pk)
         if model == ShoppingCart:
@@ -160,34 +161,31 @@ class RecipeViewSet(ModelViewSet):
     @action(detail=False, methods=['get'],
             permission_classes=[IsAuthenticated])
     def download_shopping_cart(self, request):
-        final_list = {}
+        # Query data
         ingredients = IngredientAmount.objects.filter(
-            recipe__shopping_cart__user=request.user).values_list(
-            'ingredient__name', 'ingredient__measurement_unit__name',
-            'amount'
-        )
-        for item in ingredients:
-            name = item[0]
-            if name not in final_list:
-                final_list[name] = {
-                    'measurement_unit': item[1],
-                    'amount': item[2]
-                }
-            else:
-                final_list[name]['amount'] += item[2]
+            recipe__shopping_cart__user=request.user).values(
+                'ingredient__name', 'ingredient__measurement_unit__name'
+        ).annotate(total_amount=Sum('amount'))
+        # Prepare PDF file
         pdfmetrics.registerFont(
-            TTFont('Handicraft', './data/font.ttf', 'UTF-8'))
+            TTFont('Baldur', './data/Baldur.ttf', 'UTF-8'))
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = ('attachment; '
                                            'filename="shopping_list.pdf"')
         page = canvas.Canvas(response)
-        page.setFont('Handicraft', size=24)
+        page.setFont('Baldur', size=30)
         page.drawString(200, 800, 'Список покупок')
-        page.setFont('Handicraft', size=16)
+        page.setFont('Baldur', size=20)
+        # Handicraft
         height = 750
-        for i, (name, data) in enumerate(final_list.items(), 1):
-            page.drawString(75, height, (f'{i}. {name} - {data["amount"]} '
-                                         f'{data["measurement_unit"]}'))
+        # Add ingredients from shopping cart
+        for i, obj in enumerate(ingredients, 1):
+            page.drawString(
+                75, height, (
+                    f'{i}. {obj["ingredient__name"]} - {obj["total_amount"]} '
+                    f'{obj["ingredient__measurement_unit__name"]}'
+                )
+            )
             height -= 25
         page.showPage()
         page.save()

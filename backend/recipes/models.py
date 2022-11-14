@@ -1,5 +1,9 @@
 from django.contrib.auth import get_user_model
-from django.core.validators import MinValueValidator, RegexValidator
+from django.core.validators import (
+    MaxLengthValidator,
+    MinValueValidator,
+    RegexValidator,
+)
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -7,7 +11,7 @@ User = get_user_model()
 
 
 class Subscription(models.Model):
-    '''Subscription model.'''
+    """Subscription model."""
 
     author = models.ForeignKey(
         User,
@@ -38,12 +42,13 @@ class Subscription(models.Model):
 
 
 class Tag(models.Model):
-    '''Tag model.'''
+    """Tag model."""
 
     name = models.CharField(
         max_length=200,
         verbose_name=_('tag name'),
-        unique=True
+        unique=True,
+        db_index=True
     )
     color = models.CharField(
         max_length=7,
@@ -55,6 +60,7 @@ class Tag(models.Model):
         max_length=200,
         verbose_name=_('slug'),
         unique=True,
+        db_index=True,
     )
 
     class Meta:
@@ -66,7 +72,7 @@ class Tag(models.Model):
 
 
 class Unit(models.Model):
-    '''Unit of measure model.'''
+    """Unit of measure model."""
 
     name = models.CharField(
         max_length=200,
@@ -83,7 +89,7 @@ class Unit(models.Model):
 
 
 class Ingredient(models.Model):
-    '''Ingredient model.'''
+    """Ingredient model."""
 
     name = models.CharField(
         max_length=200,
@@ -113,7 +119,7 @@ class Ingredient(models.Model):
 
 
 class IngredientAmount(models.Model):
-    '''Ingredient amount model.'''
+    """Ingredient amount model."""
 
     recipe = models.ForeignKey(
         'Recipe',
@@ -152,7 +158,7 @@ class IngredientAmount(models.Model):
 
 
 class Recipe(models.Model):
-    '''Recipe model.'''
+    """Recipe model."""
 
     author = models.ForeignKey(
         User,
@@ -169,7 +175,13 @@ class Recipe(models.Model):
         upload_to='images/',
     )
     text = models.TextField(
-        verbose_name=_('description')
+        verbose_name=_('description'),
+        validators=[
+            MaxLengthValidator(
+                1000,
+                message=_('Maximum description length is 1000 characters')
+            )
+        ]
     )
     ingredients = models.ManyToManyField(
         Ingredient,
@@ -202,7 +214,7 @@ class Recipe(models.Model):
 
 
 class ShoppingCart(models.Model):
-    '''Recipe shopping cart model.'''
+    """Recipe shopping cart model."""
 
     user = models.ForeignKey(
         User,
@@ -226,7 +238,7 @@ class ShoppingCart(models.Model):
 
 
 class Favorite(models.Model):
-    '''Favorite recipes model.'''
+    """Favorite recipes model."""
 
     user = models.ForeignKey(
         User,

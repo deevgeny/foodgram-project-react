@@ -2,13 +2,14 @@ import json
 
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
+
 from recipes.models import Ingredient, Unit
 
 DATA_PATH = settings.BASE_DIR.joinpath('data')
 
 
 class Command(BaseCommand):
-    '''Custom command to load ingredients to database.'''
+    """Custom command to load ingredients to database."""
 
     def add_arguments(self, parser):
         parser.add_argument('file', nargs='?', default='ingredients.json',

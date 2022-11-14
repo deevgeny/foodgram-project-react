@@ -43,6 +43,15 @@ def test_hex_code_field_validator(tag):
     )
 
 
+@pytest.mark.parametrize('field_name, value',
+                         [('name', True), ('color', False),
+                          ('slug', True)])
+def test_model_fields_db_index_attribute(tag, field_name, value):
+    assert tag._meta.get_field(field_name).db_index == value, (
+        f'Tag.{field_name} field should be defined as db_index={value}'
+    )
+
+
 def test_model_str_method(tag):
     assert str(tag) == tag.name, (
         'Tag model __str__() method output is incorrect'
