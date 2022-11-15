@@ -1,9 +1,13 @@
 # Foodgram - graduate project
 
+![Foodgram workflow status](https://github.com/evgeny81d/foodgram-project-react/actions/workflows/foodgram_workflow.yml/badge.svg)
+
+
 Foodgram allows users to publish recipes, subscribe to other users,
 add recipes to favorites and shopping cart, download list of products from 
 shopping cart to buy everything and start cooking.
 
+[Demo web site](http://158.160.44.11)
 
 # Technology stack
 
@@ -46,7 +50,7 @@ POSTGRES_USER=<your postgres user name>
 POSTGRES_PASSWORD=<your postres user password>
 DB_HOST=db
 DB_PORT=5432
-SECRET_KEY=<your django secret key>
+SECRET_KEY=<your secret key>
 ```
 
 ## Run the project
@@ -56,7 +60,7 @@ SECRET_KEY=<your django secret key>
 cd foodgram-project-react/infra/
 
 # Start the project
-sudo docker-compose up --buld -d
+sudo docker-compose up --build -d
 
 # Run migrations in backend container
 sudo docker exec -it infra_backend_1 python manage.py migrate
@@ -68,12 +72,11 @@ sudo docker exec -it infra_backend_1 python manage.py collectstatic --no-input
 sudo docker exec -it infra_backend_1 python manage.py createsuperuser
 ```
 
-Now foodgram is avialable here: http://localhost
+Now foodgram homepage is avialable here: http://localhost
 
-Admin site here: http://localhost/admin/
+Admin site: http://localhost/admin/
 
-API docs here: http://localhost/api/docs/
-
+API docs: http://localhost/api/docs/
 
 
 ## Stop the project
@@ -89,6 +92,7 @@ sudo docker-compose stop
 # Start again
 sudo docker-compose start
 ```
+
 
 # How to install virtual environment and run pytest
 

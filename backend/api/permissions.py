@@ -2,9 +2,9 @@ from rest_framework import permissions
 
 
 class IsAuthorIsAdminOrReadOnly(permissions.BasePermission):
-    '''Allow safe methods for unauthenticated users or all methods for admins
+    """Allow safe methods for unauthenticated users or all methods for admins
     and content owners.
-    '''
+    """
 
     def has_permission(self, request, view):
         return (
@@ -22,7 +22,7 @@ class IsAuthorIsAdminOrReadOnly(permissions.BasePermission):
 
 
 class Block(permissions.BasePermission):
-    '''Block access for all users.'''
+    """Block access for all users."""
 
     def has_permission(self, request, view):
         return False

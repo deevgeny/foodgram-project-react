@@ -12,10 +12,10 @@ router.register('ingredients', api_views.IngredientViewSet)
 router.register('recipes', api_views.RecipeViewSet)
 
 urlpatterns = [
-    re_path(r"^auth/token/login/?$",
-            api_views.CustomTokenCreateView.as_view(), name="login"),
-    re_path(r"^auth/token/logout/?$",
-            djoser_views.TokenDestroyView.as_view(), name="logout"),
+    re_path(r'^auth/token/login/?$',
+            api_views.CustomTokenCreateView.as_view(), name='login'),
+    re_path(r'^auth/token/logout/?$',
+            djoser_views.TokenDestroyView.as_view(), name='logout'),
     path('users/subscriptions/',
          api_views.SubscriptionListView.as_view(), name='subscriptions'),
     path('users/<int:user_id>/subscribe/',
