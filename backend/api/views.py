@@ -128,10 +128,9 @@ class RecipeViewSet(ModelViewSet):
             if ShoppingCart.objects.filter(user=user, recipe=recipe).exists():
                 ShoppingCart.objects.filter(user=user, recipe=recipe).delete()
                 return Response(status=status.HTTP_204_NO_CONTENT)
-            else:
-                raise ValidationError({
-                    'errors': 'recipe does not exist in shopping cart'
-                })
+            raise ValidationError({
+                'errors': 'recipe does not exist in shopping cart'
+            })
         model_obj = get_object_or_404(model, user=user, recipe=recipe)
         model_obj.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

@@ -1,5 +1,8 @@
 # Foodgram - graduate project
 
+![workflow status](https://github.com/evgeny81d/foodgram-project-react/actions/workflows/foodgram_workflow.yml/badge.svg)
+
+
 Foodgram allows users to publish recipes, subscribe to other users,
 add recipes to favorites and shopping cart, download list of products from 
 shopping cart to buy everything and start cooking.
