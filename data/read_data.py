@@ -3,8 +3,8 @@ import json
 with open('ingredients.json', 'r') as f:
     data = json.load(f)
 
-
 # Collect measurement unit data
+
 uom = set()
 for i in data:
     uom.add(i['measurement_unit'])
@@ -20,3 +20,4 @@ for i in data:
 print(uom)
 
 print(uom_product)
+

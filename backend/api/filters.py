@@ -4,12 +4,14 @@ from rest_framework.filters import SearchFilter
 from recipes.models import Recipe
 
 
+
 class IngredientSearchFilter(SearchFilter):
     search_param = 'name'
 
 
 class RecipeFilter(FilterSet):
     """Custom recipe filter.
+
 
     * filter by author
     * filter by tag (slug field)

@@ -11,6 +11,7 @@ def test_model_name_field(ingredient):
     )
     assert not field.unique, (
         f'Ingredient.{field.name} field should be defiend as unique=False'
+
     )
 
 
@@ -44,6 +45,7 @@ def test_model_meta_class_constraints_fields(ingredient):
         'Ingredient model class Meta should have unique constraint for '
         f'{fields} model fields'
     )
+
 
 
 def test_models_str_method(ingredient):

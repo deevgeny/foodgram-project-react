@@ -6,6 +6,7 @@ class IsAuthorIsAdminOrReadOnly(permissions.BasePermission):
     and content owners.
     """
 
+
     def has_permission(self, request, view):
         return (
             request.method in permissions.SAFE_METHODS
@@ -23,6 +24,7 @@ class IsAuthorIsAdminOrReadOnly(permissions.BasePermission):
 
 class Block(permissions.BasePermission):
     """Block access for all users."""
+
 
     def has_permission(self, request, view):
         return False

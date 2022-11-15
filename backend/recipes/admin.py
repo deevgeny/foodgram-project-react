@@ -67,6 +67,7 @@ class RecipeAdmin(admin.ModelAdmin):
     @staticmethod
     def favorited(obj):
         """Count number of times recipe is favorited."""
+
         return obj.favorited_by.count()
 
     @staticmethod
@@ -79,6 +80,7 @@ class RecipeAdmin(admin.ModelAdmin):
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         """Override change view function to add extra arguments."""
+
         extra_context = extra_context or {}
         # Add recipe favorited count
         extra_context['favorited_title'] = _('Favorited')
