@@ -7,17 +7,18 @@ Foodgram allows users to publish recipes, subscribe to other users,
 add recipes to favorites and shopping cart, download list of products from 
 shopping cart to buy everything and start cooking.
 
+[Demo web site](http://158.160.44.11)
 
 # Technology stack
 
-Python 3.7
-Django 3.2
-Django REST framework 3.14
-Django filter 22.1
-Gunicorn 20.1
-Nginx 1.19
-Postgresql 13
-Docker
+* Python 3.7
+* Django 3.2
+* Django REST framework 3.14
+* Django filter 22.1
+* Gunicorn 20.1
+* Nginx 1.19
+* Postgresql 13
+* Docker
 
 
 # How it works
@@ -71,7 +72,11 @@ sudo docker exec -it infra_backend_1 python manage.py collectstatic --no-input
 sudo docker exec -it infra_backend_1 python manage.py createsuperuser
 ```
 
-Now foodgram is avialable here: http://localhost
+Now foodgram homepage is avialable here: http://localhost
+
+Admin site: http://localhost/admin/
+
+API docs: http://localhost/api/docs/
 
 
 ## Stop the project

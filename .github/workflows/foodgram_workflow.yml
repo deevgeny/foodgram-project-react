@@ -92,6 +92,10 @@ jobs:
             sudo docker-compose exec -T backend python manage.py load_ingredients
             sudo docker-compose exec -T backend python manage.py load_tags
             sudo docker-compose exec -T backend python manage.py collectstatic --no-input
+            sudo docker-compose exec -T backend python manage.py create_admin \
+            --username ${{ secrets.ADMIN_USERNAME }} \
+            --email ${{ secrets.ADMIN_EMAIL }} \
+            --password ${{ secrets.ADMIN_PASSWORD }}
   send_message:
     name: Send message
     runs-on: ubuntu-latest
