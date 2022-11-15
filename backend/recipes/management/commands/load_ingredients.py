@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from recipes.models import Ingredient, Unit
 
-DATA_PATH = settings.BASE_DIR.joinpath('data')
+DATA_PATH = settings.BASE_DIR / 'data'
 
 
 class Command(BaseCommand):

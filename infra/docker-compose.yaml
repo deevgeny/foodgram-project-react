@@ -10,8 +10,8 @@ services:
       - ./.env
 
   backend:
-    # image: evgeny81d/foodgram_backend:latest
-    build: ../backend/
+    image: evgeny81d/foodgram_backend:latest
+    # build: ../backend/
     expose:
       - 8000
     restart: always
@@ -38,10 +38,10 @@ services:
       - frontend
 
   frontend:
-    # image: evgeny81d/foodgram_frontend:latest
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
+    image: evgeny81d/foodgram_frontend:latest
+    # build:
+      # context: ../frontend
+      # dockerfile: Dockerfile
     volumes:
       - ../frontend/:/app/result_build/
 

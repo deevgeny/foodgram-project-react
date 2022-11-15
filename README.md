@@ -1,6 +1,6 @@
 # Foodgram - graduate project
 
-![workflow status](https://github.com/evgeny81d/foodgram-project-react/actions/workflows/foodgram_workflow.yml/badge.svg)
+![Foodgram workflow status](https://github.com/evgeny81d/foodgram-project-react/actions/workflows/foodgram_workflow.yml/badge.svg)
 
 
 Foodgram allows users to publish recipes, subscribe to other users,
