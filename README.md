@@ -59,7 +59,7 @@ SECRET_KEY=<your secret key>
 cd foodgram-project-react/infra/
 
 # Start the project
-sudo docker-compose up --buld -d
+sudo docker-compose up --build -d
 
 # Run migrations in backend container
 sudo docker exec -it infra_backend_1 python manage.py migrate

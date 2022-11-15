@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.3'
 
 services:
 
@@ -40,8 +40,8 @@ services:
   frontend:
     image: evgeny81d/foodgram_frontend:latest
     # build:
-      # context: ../frontend
-      # dockerfile: Dockerfile
+    #   context: ../frontend
+    #   dockerfile: Dockerfile
     volumes:
       - ../frontend/:/app/result_build/
 
