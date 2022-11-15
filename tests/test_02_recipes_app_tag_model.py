@@ -52,6 +52,7 @@ def test_model_fields_db_index_attribute(tag, field_name, value):
     )
 
 
+
 def test_model_str_method(tag):
     assert str(tag) == tag.name, (
         'Tag model __str__() method output is incorrect'

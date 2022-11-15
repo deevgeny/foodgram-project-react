@@ -10,5 +10,6 @@ class User(AbstractUser):
     first_name = models.CharField(_('first name'), max_length=150)
     last_name = models.CharField(_('last name'), max_length=150)
 
+
     class Meta:
         ordering = ('id',)

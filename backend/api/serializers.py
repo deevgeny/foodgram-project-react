@@ -3,6 +3,7 @@ from djoser.serializers import UserCreateSerializer
 from drf_base64.fields import Base64ImageField
 from rest_framework import serializers
 
+
 from recipes.models import (
     Favorite,
     Ingredient,
@@ -17,6 +18,7 @@ User = get_user_model()
 
 class CustomUserReadSerializer(serializers.ModelSerializer):
     """User model serializer to display user info."""
+
 
     is_subscribed = serializers.SerializerMethodField(read_only=True)
 
@@ -37,6 +39,7 @@ class CustomUserReadSerializer(serializers.ModelSerializer):
 class CustomUserCreateSerializer(UserCreateSerializer):
     """Djoser customized serializer for registration of new users."""
 
+
     class Meta:
         model = User
         fields = ('email', 'id', 'username', 'first_name', 'first_name',
@@ -47,6 +50,7 @@ class CustomUserCreateSerializer(UserCreateSerializer):
 class TagSerializer(serializers.ModelSerializer):
     """Tag model serializer."""
 
+
     class Meta:
         model = Tag
         fields = '__all__'
@@ -55,6 +59,7 @@ class TagSerializer(serializers.ModelSerializer):
 
 class IngredientSerializer(serializers.ModelSerializer):
     """Ingredient model serializer."""
+
 
     measurement_unit = serializers.StringRelatedField()
 
@@ -66,6 +71,7 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 class IngredientAmountSerializer(serializers.ModelSerializer):
     """IngredientsList model serializer."""
+
 
     id = serializers.ReadOnlyField(source='ingredient.id')
     name = serializers.ReadOnlyField(source='ingredient.name')
@@ -80,6 +86,7 @@ class IngredientAmountSerializer(serializers.ModelSerializer):
 
 class RecipeListSerializer(serializers.ModelSerializer):
     """Recipe model read serializer."""
+
 
     author = CustomUserReadSerializer(read_only=True)
     tags = TagSerializer(read_only=True, many=True)
@@ -121,6 +128,7 @@ class CreateIngredientAmountSerializer(serializers.ModelSerializer):
 
 class RecipeCreateSerializer(serializers.ModelSerializer):
     """Recipe model create serializer."""
+
 
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(), many=True

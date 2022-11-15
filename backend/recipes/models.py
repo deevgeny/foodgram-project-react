@@ -4,6 +4,7 @@ from django.core.validators import (
     MinValueValidator,
     RegexValidator,
 )
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -12,6 +13,7 @@ User = get_user_model()
 
 class Subscription(models.Model):
     """Subscription model."""
+
 
     author = models.ForeignKey(
         User,
@@ -44,11 +46,13 @@ class Subscription(models.Model):
 class Tag(models.Model):
     """Tag model."""
 
+
     name = models.CharField(
         max_length=200,
         verbose_name=_('tag name'),
         unique=True,
         db_index=True
+
     )
     color = models.CharField(
         max_length=7,
@@ -61,6 +65,7 @@ class Tag(models.Model):
         verbose_name=_('slug'),
         unique=True,
         db_index=True,
+
     )
 
     class Meta:
@@ -73,6 +78,7 @@ class Tag(models.Model):
 
 class Unit(models.Model):
     """Unit of measure model."""
+
 
     name = models.CharField(
         max_length=200,
@@ -90,6 +96,7 @@ class Unit(models.Model):
 
 class Ingredient(models.Model):
     """Ingredient model."""
+
 
     name = models.CharField(
         max_length=200,
@@ -114,12 +121,14 @@ class Ingredient(models.Model):
             )
         ]
 
+
     def __str__(self):
         return f'{self.name} {self.measurement_unit}'
 
 
 class IngredientAmount(models.Model):
     """Ingredient amount model."""
+
 
     recipe = models.ForeignKey(
         'Recipe',
@@ -159,6 +168,7 @@ class IngredientAmount(models.Model):
 
 class Recipe(models.Model):
     """Recipe model."""
+
 
     author = models.ForeignKey(
         User,

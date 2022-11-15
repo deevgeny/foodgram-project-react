@@ -4,6 +4,7 @@ import django.core.validators
 from django.db import migrations, models
 
 
+
 class Migration(migrations.Migration):
 
     initial = True
@@ -38,6 +39,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('amount', models.PositiveSmallIntegerField(validators=[django.core.validators.MinValueValidator(1, message='Amount should be more than 0')], verbose_name='amount')),
+
+
             ],
             options={
                 'verbose_name': 'ingredient amount',
@@ -52,10 +55,12 @@ class Migration(migrations.Migration):
                 ('image', models.ImageField(upload_to='images/', verbose_name='image')),
                 ('text', models.TextField(validators=[django.core.validators.MaxLengthValidator(1000, message='Maximum description length is 1000 characters')], verbose_name='description')),
                 ('cooking_time', models.PositiveSmallIntegerField(validators=[django.core.validators.MinValueValidator(1, message='Cooking time should be more than 0')], verbose_name='cooking time')),
+
             ],
             options={
                 'verbose_name': 'recipe',
                 'verbose_name_plural': 'recipes',
+
                 'ordering': ('id',),
             },
         ),
@@ -67,12 +72,15 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'shopping cart',
                 'verbose_name_plural': 'shopping carts',
+
             },
         ),
         migrations.CreateModel(
             name='Subscription',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+
+
             ],
             options={
                 'verbose_name': 'subscription',
@@ -103,4 +111,5 @@ class Migration(migrations.Migration):
                 'verbose_name_plural': 'units of measure',
             },
         ),
+
     ]

@@ -33,6 +33,7 @@ from .serializers import (
     SubscriptionSerializer,
     TagSerializer,
 )
+
 from recipes.models import (
     Favorite,
     Ingredient,
@@ -42,6 +43,7 @@ from recipes.models import (
     Subscription,
     Tag,
 )
+
 
 User = get_user_model()
 
@@ -93,11 +95,13 @@ class IngredientViewSet(ReadOnlyModelViewSet):
 class RecipeViewSet(ModelViewSet):
     """Recipe model viewset.
 
+
     * GET method - list(), retrive().
     * POST method - create().
     * PATCH method - partial_update().
     * DELETE method - destroy().
     """
+
 
     queryset = Recipe.objects.all()
     permission_classes = [IsAuthorIsAdminOrReadOnly]
@@ -113,6 +117,7 @@ class RecipeViewSet(ModelViewSet):
     @staticmethod
     def actions_post_method(request, pk, serializer_class):
         """Reusable function for actions post methods."""
+
         data = {'user': request.user.id, 'recipe': pk}
         serializer = serializer_class(data=data, context={'request': request})
         serializer.is_valid(raise_exception=True)
@@ -122,6 +127,7 @@ class RecipeViewSet(ModelViewSet):
     @staticmethod
     def actions_delete_method(request, pk, model):
         """Reusable function for actions delete methods."""
+
         user = request.user
         recipe = get_object_or_404(Recipe, id=pk)
         if model == ShoppingCart:
@@ -131,6 +137,7 @@ class RecipeViewSet(ModelViewSet):
             raise ValidationError({
                 'errors': 'recipe does not exist in shopping cart'
             })
+
         model_obj = get_object_or_404(model, user=user, recipe=recipe)
         model_obj.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -168,6 +175,7 @@ class RecipeViewSet(ModelViewSet):
         # Prepare PDF file
         pdfmetrics.registerFont(
             TTFont('Baldur', './data/Baldur.ttf', 'UTF-8'))
+
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = ('attachment; '
                                            'filename="shopping_list.pdf"')
