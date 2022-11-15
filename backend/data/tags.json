@@ -1,7 +1,7 @@
 [
     {"name": "Завтрак", "color": "#2ecc71", "slug": "breakfast"},
     {"name": "Обед", "color": "#3498db", "slug": "lunch"}, 
-    {"name": "Ужин", "color": " #a569bd", "slug": "dinner"},
+    {"name": "Ужин", "color": "#a569bd", "slug": "dinner"},
     {"name": "Десерт", "color": "#ec7063", "slug": "dessert"},
     {"name": "Напитки", "color": "#f7dc6f", "slug": "drinks"},
     {"name": "Суп", "color": "#dc7633", "slug": "soup"},
