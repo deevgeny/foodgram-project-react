@@ -3,10 +3,13 @@ import json
 with open('ingredients.json', 'r') as f:
     data = json.load(f)
 
+
+# Collect measurement unit data
 uom = set()
 for i in data:
     uom.add(i['measurement_unit'])
 
+# Collect data {'measurement_unit': ['name', ...]}
 uom_product = {}
 for i in data:
     if i['measurement_unit'] in uom_product:
@@ -16,4 +19,4 @@ for i in data:
 
 print(uom)
 
-print(uom_product['кг'])
+print(uom_product)

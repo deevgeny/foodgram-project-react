@@ -1,5 +1,6 @@
-from django.core.validators import MinValueValidator
+from django.core.validators import MaxLengthValidator, MinValueValidator
 from django.db import models
+
 from recipes.models import IngredientAmount
 
 
@@ -42,8 +43,17 @@ def test_model_image_field(recipe):
 def test_model_text_field(recipe):
     field = recipe._meta.get_field('text')
     blank = False
+    validator = MaxLengthValidator
+    limit_value = 1000
     assert field.blank == blank, (
         f'Recipe.{field.name} field should be defined as blank={blank}'
+    )
+    assert isinstance(field.validators[0], validator), (
+        f'Recipe.{field.name} field should have {validator.__name__}'
+    )
+    assert field.validators[0].limit_value == limit_value, (
+        f'Recipe.{field.name} field {validator.__name__} should be '
+        f'defined as limit_value={limit_value}'
     )
 
 

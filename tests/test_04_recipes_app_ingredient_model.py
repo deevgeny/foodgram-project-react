@@ -9,8 +9,8 @@ def test_model_name_field(ingredient):
     assert field.db_index, (
         f'Ingredient.{field.name} field should be defiend as db_index=True'
     )
-    assert field.unique, (
-        f'Ingredient.{field.name} field should be defiend as unique=True'
+    assert not field.unique, (
+        f'Ingredient.{field.name} field should be defiend as unique=False'
     )
 
 
@@ -25,6 +25,24 @@ def test_model_measurement_unit_field(ingredient):
     assert field.remote_field.related_name == related_name, (
         f'Ingredient.{field.name} field should be defiend as '
         f'related_name={related_name}'
+    )
+
+
+def test_model_meta_class_constraints(ingredient):
+    constraint = models.UniqueConstraint
+    assert len(ingredient._meta.constraints) == 1, (
+        'Ingredient model class Meta should have constraints'
+    )
+    assert isinstance(ingredient._meta.constraints[0], constraint), (
+        f'Ingredient model class Meta should have {constraint}'
+    )
+
+
+def test_model_meta_class_constraints_fields(ingredient):
+    fields = ('name', 'measurement_unit')
+    assert ingredient._meta.constraints[0].fields == fields, (
+        'Ingredient model class Meta should have unique constraint for '
+        f'{fields} model fields'
     )
 
 
