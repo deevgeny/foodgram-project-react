@@ -2,6 +2,8 @@ from http import HTTPStatus
 from pathlib import Path
 
 import pytest
+from django.conf import settings
+
 from recipes.models import Recipe
 
 RECIPES_URL = '/api/recipes/'
@@ -172,7 +174,7 @@ def test_create_recipe_by_authorized_user(api_user_client, ingredient, tag):
         )
     # Clean up image files
     obj = Recipe.objects.get(id=response.data['id'])
-    path = Path('.').joinpath(obj.image.name)
+    path = Path().joinpath(settings.MEDIA_ROOT).joinpath(obj.image.name)
     path.unlink()
 
 
@@ -241,7 +243,7 @@ def test_patch_recipe_by_author(api_user_client, recipe, five_tags,
     )
     # Clean up image files
     obj = Recipe.objects.get(id=response.data['id'])
-    path = Path('.').joinpath(obj.image.name)
+    path = Path().joinpath(settings.MEDIA_ROOT).joinpath(obj.image.name)
     path.unlink()
 
 

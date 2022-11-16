@@ -140,3 +140,7 @@ pyproject.toml
 
 # images dir
 images
+media
+
+# tests
+test_settings.py

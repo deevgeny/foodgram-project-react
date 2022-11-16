@@ -121,10 +121,9 @@ def test_user_registration_with_bad_data(api_client):
         'last_name': 'Pupkin',
         'password': 'VasyaStrong'
     }
-    response_data = {'email': ['This field is required.']}
     response = api_client.post(USERS_URL, data=data)
-    assert response.data == response_data, (
-        'Incorrect response data'
+    assert 'email' in response.data, (
+        'Incorrect response data fields for missing "email" field'
     )
     assert response.status_code == HTTPStatus.BAD_REQUEST, (
         f'Incorrect response status code {response.status_code}'
